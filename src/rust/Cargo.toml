@@ -1,0 +1,23 @@
+[package]
+name = 'deltaR'
+publish = false
+version = '0.1.0'
+edition = '2021'
+#rust-version = '1.88'
+
+[lib]
+crate-type = [ 'staticlib' ]
+name = 'deltaR'
+
+[dependencies]
+arrow = { version = "57.1", default-features = false, features = ["ffi"] }
+arrow_extendr = "57.0.0"
+chrono = "0.4"
+deltalake = { version = "0.30.0", features = ["datafusion", "gcs", "s3", "azure"] }
+extendr-api = { version = "0.8.1", features = ["result_condition"] }
+tokio = { version = "1.49.0", features = ["rt"] }
+url = "2.5"
+
+[profile.release]
+lto = true
+codegen-units = 1
