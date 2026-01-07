@@ -1,6 +1,6 @@
 Package: deltaR
 Title: R Interface to Delta Lake
-Version: 0.0.0.9000
+Version: 0.1.0
 Authors@R:
     person("ixpantia", email = "hola@ixpantia.com", role = c("aut", "cre"))
 Description: Provides an R interface to Delta Lake via the delta-rs Rust library.
