@@ -12,7 +12,8 @@ write_deltalake(
   name = NULL,
   description = NULL,
   storage_options = NULL,
-  schema_mode = NULL
+  schema_mode = NULL,
+  target_file_size = NULL
 )
 }
 \arguments{
@@ -43,6 +44,9 @@ or any object that can be converted to an Arrow RecordBatchReader via
 \item \code{"overwrite"}: Replace the schema with the new schema.
 \item \code{"merge"}: Merge the new schema with the existing schema.
 }}
+
+\item{target_file_size}{Integer. Target size in bytes for each output file (optional).
+When set, the writer will try to create files of approximately this size.}
 }
 \value{
 A list with write result information:

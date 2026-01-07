@@ -6,10 +6,12 @@ Authors@R:
 Description: Provides an R interface to Delta Lake via the delta-rs Rust library.
     Enables reading and writing Delta Lake tables with full ACID transaction support,
     time travel, and schema evolution capabilities.
-License: MIT + file LICENSE
+License: Apache License (>= 2)
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.2
+URL: https://github.com/ixpantia/deltaR, https://ixpantia.github.io/deltar/
+BugReports: https://github.com/ixpantia/deltaR/issues
 Config/rextendr/version: 0.4.2
 SystemRequirements: Cargo (Rust's package manager), rustc >= 1.65.0, xz
 Depends:
@@ -20,5 +22,10 @@ Imports:
     S7
 Suggests:
     arrow,
+    dplyr,
+    hms,
+    knitr,
+    rmarkdown,
     testthat (>= 3.0.0)
+VignetteBuilder: knitr
 Config/testthat/edition: 3

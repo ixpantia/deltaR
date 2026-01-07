@@ -46,6 +46,8 @@ ensure_directory_exists <- function(path) {
 #'     \item `"overwrite"`: Replace the schema with the new schema.
 #'     \item `"merge"`: Merge the new schema with the existing schema.
 #'   }
+#' @param target_file_size Integer. Target size in bytes for each output file (optional).
+#'   When set, the writer will try to create files of approximately this size.
 #'
 #' @return A list with write result information:
 #'   \itemize{
@@ -106,7 +108,8 @@ write_deltalake <- function(
   name = NULL,
   description = NULL,
   storage_options = NULL,
-  schema_mode = NULL
+  schema_mode = NULL,
+  target_file_size = NULL
 ) {
   # Validate mode
 
@@ -133,7 +136,8 @@ write_deltalake <- function(
     name = name,
     description = description,
     storage_options = storage_options,
-    schema_mode = schema_mode
+    schema_mode = schema_mode,
+    target_file_size = target_file_size
   )
 
   # Handle errors from Rust

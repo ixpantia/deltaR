@@ -2,7 +2,7 @@
 % Please edit documentation in R/extendr-wrappers.R
 \name{delta_write}
 \alias{delta_write}
-\title{Write data to a Delta Lake table}
+\title{Write data to a Delta Lake table using WriteBuilder and LogicalPlan}
 \usage{
 delta_write(
   table_uri,
@@ -12,7 +12,8 @@ delta_write(
   name,
   description,
   storage_options,
-  schema_mode
+  schema_mode,
+  target_file_size
 )
 }
 \arguments{
@@ -30,8 +31,16 @@ delta_write(
 
 \item{schema_mode}{How to handle schema evolution: "overwrite" or "merge" (optional)}
 
+\item{target_file_size}{Target file size in bytes (optional)}
+
 \item{data}{Arrow data stream (nanoarrow_array_stream)}
 }
 \description{
-Write data to a Delta Lake table
+This function uses DataFusion's execution framework to write data, providing:
+\itemize{
+\item Better error handling through the DataFusion pipeline
+\item Lazy schema casting (casts each batch on-the-fly)
+\item Proper backpressure handling for large datasets
+\item Memory-efficient streaming writes
+}
 }

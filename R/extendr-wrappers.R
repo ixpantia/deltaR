@@ -18,7 +18,13 @@ delta_table_open <- function(path, storage_options) .Call(wrap__delta_table_open
 #' @export
 is_delta_table <- function(path, storage_options) .Call(wrap__is_delta_table, path, storage_options)
 
-#' Write data to a Delta Lake table
+#' Write data to a Delta Lake table using WriteBuilder and LogicalPlan
+#'
+#' This function uses DataFusion's execution framework to write data, providing:
+#' - Better error handling through the DataFusion pipeline
+#' - Lazy schema casting (casts each batch on-the-fly)
+#' - Proper backpressure handling for large datasets
+#' - Memory-efficient streaming writes
 #'
 #' @param table_uri Path to the Delta table (will be created if it doesn't exist)
 #' @param data Arrow data stream (nanoarrow_array_stream)
@@ -28,8 +34,9 @@ is_delta_table <- function(path, storage_options) .Call(wrap__is_delta_table, pa
 #' @param description Table description (optional, used when creating new table)
 #' @param storage_options Storage backend options (optional)
 #' @param schema_mode How to handle schema evolution: "overwrite" or "merge" (optional)
+#' @param target_file_size Target file size in bytes (optional)
 #' @export
-delta_write <- function(table_uri, stream, mode, partition_by, name, description, storage_options, schema_mode) .Call(wrap__delta_write, table_uri, stream, mode, partition_by, name, description, storage_options, schema_mode)
+delta_write <- function(table_uri, stream, mode, partition_by, name, description, storage_options, schema_mode, target_file_size) .Call(wrap__delta_write, table_uri, stream, mode, partition_by, name, description, storage_options, schema_mode, target_file_size)
 
 #' Create a new empty Delta Lake table
 #'

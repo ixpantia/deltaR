@@ -2,6 +2,111 @@
 # Note: These tests require an existing Delta table to test against
 # Since we can't write Delta tables yet, we skip tests if no test table exists
 
+# ==============================================================================
+# Strict Type Mapping Tests
+# ==============================================================================
+
+test_that("write_deltalake errors on unsupported Time type", {
+  skip_if_not_installed("hms")
+  temp_dir <- tempfile("delta_time_test_")
+  on.exit(unlink(temp_dir, recursive = TRUE), add = TRUE)
+
+  # Create data with a time column (which Delta Lake doesn't support)
+  df <- data.frame(
+    id = 1:3,
+    time_col = hms::as_hms(c("12:30:00", "13:45:00", "14:00:00"))
+  )
+
+  # This should error because Time types are not supported in Delta Lake
+  # The error message can come from either our validation or delta-rs internals
+
+  expect_error(
+    write_deltalake(df, temp_dir),
+    "(Unsupported Arrow type for Delta Lake.*Time|Invalid data type for Delta Lake.*Time)"
+  )
+})
+
+test_that("write_deltalake handles standard types correctly", {
+  temp_dir <- tempfile("delta_types_test_")
+  dir.create(temp_dir)
+  on.exit(unlink(temp_dir, recursive = TRUE), add = TRUE)
+
+  # Test various supported types
+  df <- data.frame(
+    int_col = 1L:5L,
+    dbl_col = c(1.1, 2.2, 3.3, 4.4, 5.5),
+    chr_col = letters[1:5],
+    lgl_col = c(TRUE, FALSE, TRUE, FALSE, TRUE),
+    date_col = as.Date("2024-01-01") + 0:4
+  )
+
+  result <- write_deltalake(df, temp_dir)
+  expect_equal(result$version, 0L)
+  expect_true(is_delta_table_path(temp_dir))
+})
+
+test_that("create_deltalake errors on unsupported types in schema", {
+  skip_if_not_installed("hms")
+  temp_dir <- tempfile("delta_create_unsupported_")
+  on.exit(unlink(temp_dir, recursive = TRUE), add = TRUE)
+
+  # Time type is not supported
+  schema <- nanoarrow::na_struct(list(
+    id = nanoarrow::na_int64(),
+    time_col = nanoarrow::na_time64("us")
+  ))
+
+  expect_error(
+    create_deltalake(temp_dir, schema),
+    "(Unsupported Arrow type for Delta Lake.*Time|Invalid data type for Delta Lake.*Time)"
+  )
+})
+
+# ==============================================================================
+# Streaming Writes Tests
+# ==============================================================================
+
+test_that("write_deltalake handles empty data gracefully", {
+  temp_dir <- tempfile("delta_empty_test_")
+  dir.create(temp_dir)
+  on.exit(unlink(temp_dir, recursive = TRUE), add = TRUE)
+
+  # Create empty data frame with schema
+  df <- data.frame(x = integer(0), y = character(0))
+
+  # Empty data frames are allowed - they create a table with 0 files
+  # This is consistent with delta-rs behavior
+  result <- write_deltalake(df, temp_dir)
+  expect_equal(result$version, 0L)
+  expect_equal(result$num_files, 0L)
+  expect_true(is_delta_table_path(temp_dir))
+})
+
+test_that("write_deltalake writes multiple batches correctly", {
+  temp_dir <- tempfile("delta_batches_test_")
+  dir.create(temp_dir)
+  on.exit(unlink(temp_dir, recursive = TRUE), add = TRUE)
+
+  # Create a larger dataset that might be split into multiple batches
+  n <- 10000
+  df <- data.frame(
+    id = seq_len(n),
+    value = runif(n),
+    category = sample(letters[1:5], n, replace = TRUE)
+  )
+
+  result <- write_deltalake(df, temp_dir)
+  expect_equal(result$version, 0L)
+  expect_true(result$num_files >= 1)
+
+  # Verify table was created correctly
+  expect_true(is_delta_table_path(temp_dir))
+})
+
+# ==============================================================================
+# Original Tests
+# ==============================================================================
+
 test_that("is_delta_table_path returns FALSE for non-existent path", {
   temp_dir <- tempfile("not_delta_")
   expect_false(is_delta_table_path(temp_dir))

@@ -1885,9 +1885,11 @@ version = "0.1.0"
 dependencies = [
  "arrow",
  "arrow_extendr",
+ "async-trait",
  "chrono",
  "deltalake",
  "extendr-api",
+ "parking_lot",
  "tokio",
  "url",
 ]
