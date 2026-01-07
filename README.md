@@ -238,11 +238,11 @@ write_deltalake(
 
 deltaR is built on the shoulders of giants:
 
-- **[delta-rs](https://github.com/delta-io/delta-rs)** - The Rust implementation of Delta Lake that powers this package. We are grateful to the delta-rs maintainers and contributors for their excellent work.
-- **[Delta Lake](https://delta.io/)** - The open-source storage layer that brings reliability to data lakes.
-- **[Apache Arrow](https://arrow.apache.org/)** - The columnar memory format that enables high-performance data interchange.
-- **[extendr](https://extendr.github.io/)** - The framework that makes it possible to call Rust from R.
-- **[nanoarrow](https://github.com/apache/arrow-nanoarrow)** - Lightweight Arrow implementation for R.
+- **[delta-rs](https://github.com/delta-io/delta-rs)**
+- **[Delta Lake](https://delta.io/)**
+- **[Apache Arrow](https://arrow.apache.org/)**
+- **[extendr](https://extendr.github.io/)** - Thanks to CGMossa and the extendr contributors for making Rust + R a reality
+- **[arrow-extendr](https://github.com/extendr/arrow-extendr)** - Thanks to @JosiahParry for the Arrow bindings that make this all work together
 
 ## Contributing
 
@@ -255,6 +255,7 @@ This project is licensed under the Apache License 2.0 - see the [LICENSE](LICENS
 ## Related Projects
 
 - [arrow](https://arrow.apache.org/docs/r/) - R package for Apache Arrow
+- [polars](https://pola-rs.github.io/r-polars/) - R interface for Polars (can read Delta tables)
 - [duckdb](https://duckdb.org/docs/api/r) - DuckDB R API (can read Delta tables)
 - [sparklyr](https://spark.rstudio.com/) - R interface for Apache Spark (supports Delta Lake)
 
