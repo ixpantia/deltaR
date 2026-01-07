@@ -8,7 +8,7 @@
 
 ## Features
 
-- 📖 **Read Delta tables** - Query Delta tables as Arrow tables or data frames
+- 📖 **Read Delta tables** - Get file paths to use with arrow, polars, or duckdb
 - ✍️ **Write Delta tables** - Create and append to Delta tables with full ACID guarantees
 - ⏰ **Time travel** - Access historical versions of your data
 - 🔄 **Schema evolution** - Merge or overwrite schemas as your data evolves
@@ -68,40 +68,56 @@ write_deltalake(df, "path/to/my_table", mode = "overwrite")
 
 ### Reading Data
 
+deltaR delegates the actual reading of data to other libraries like arrow, polars, or duckdb. Use `get_files()` to get the Parquet file paths from the current table version:
+
 ```r
 # Open a Delta table
 dt <- delta_table("path/to/my_table")
 
 # Get table information
-dt$version()
-dt$schema()
-dt$num_files()
+table_version(dt)
+get_schema(dt)
 
-# Read as Arrow Table
-arrow_table <- dt$to_arrow()
+# Get the list of Parquet files in the current snapshot
+files <- get_files(dt)
 
-# Read as data.frame
-df <- dt$to_data_frame()
+# Read with arrow
+library(arrow)
+arrow_table <- open_dataset(files)
+df <- arrow_table |> collect()
 
-# Read with dplyr
+# Read with dplyr and arrow
 library(dplyr)
-dt$to_arrow() |>
+arrow_table |>
   filter(value > 0.5) |>
   group_by(name) |>
   summarise(total = sum(value)) |>
   collect()
+
+# Read with polars
+library(polars)
+pl_df <- pl$scan_parquet(files)$collect()
+
+# Read with duckdb
+library(duckdb)
+con <- dbConnect(duckdb())
+result <- dbGetQuery(con, sprintf("SELECT * FROM read_parquet(%s)", 
+                                   paste0("['", paste(files, collapse = "','"), "']")))
 ```
 ### Time Travel
 
 ```r
 # Load a specific version
-dt$load_version(5)
+load_version(dt, version = 5)
 
 # Load data as of a specific timestamp
-dt$load_datetime("2024-06-15T10:30:00Z")
+load_datetime(dt, datetime = "2024-06-15T10:30:00Z")
 
 # View table history
-dt$history()
+history(dt)
+
+# After time travel, get_files() returns files from that version
+files <- get_files(dt)
 ```
 
 ### Partitioned Tables
@@ -190,17 +206,17 @@ Remove old files no longer referenced by the Delta table:
 dt <- delta_table("path/to/table")
 
 # Dry run - see what would be deleted
-dt$vacuum(retention_hours = 168, dry_run = TRUE)
+vacuum(dt, retention_hours = 168, dry_run = TRUE)
 
 # Actually delete old files
-dt$vacuum(retention_hours = 168, dry_run = FALSE)
+vacuum(dt, retention_hours = 168, dry_run = FALSE)
 ```
 
 ## Performance Tips
 
 1. **Use partitioning** for large tables that are frequently filtered by specific columns
 2. **Set `target_file_size`** to control output file sizes for better read performance
-3. **Use Arrow** for downstream processing instead of converting to data.frame
+3. **Use Arrow or Polars** for downstream processing instead of converting to data.frame
 4. **Vacuum regularly** to remove old files and reduce storage costs
 
 ```r
