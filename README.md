@@ -21,7 +21,7 @@
 ### Prerequisites
 
 deltaR requires the Rust toolchain to compile from source:
-- **Rust** >= 1.65.0 ([Install Rust](https://rustup.rs/))
+- **Rust** >= 1.88 ([Install Rust](https://rustup.rs/))
 - **Cargo** (included with Rust)
 
 ### Install from GitHub
