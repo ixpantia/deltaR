@@ -14,7 +14,6 @@ use tokio::runtime::Runtime;
 
 /// Register cloud storage handlers (GCS, S3, Azure) for deltalake
 /// Called from R's .onLoad to enable cloud storage support
-/// @export
 #[extendr]
 fn register_cloud_handlers() {
     // Register GCS handler
@@ -353,7 +352,6 @@ impl DeltaTableInternal {
 }
 
 /// Open a Delta Table at the specified path
-/// @export
 #[extendr]
 fn delta_table_open(path: &str, storage_options: Nullable<List>) -> Result<DeltaTableInternal> {
     let url = path_to_url(path).map_err(Error::from)?;
@@ -376,7 +374,6 @@ fn delta_table_open(path: &str, storage_options: Nullable<List>) -> Result<Delta
 }
 
 /// Check if a path is a Delta Table
-/// @export
 #[extendr]
 fn is_delta_table(path: &str, storage_options: Nullable<List>) -> bool {
     let url = match path_to_url(path) {

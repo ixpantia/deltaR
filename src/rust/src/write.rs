@@ -275,7 +275,6 @@ fn to_lazy_table(
 /// @param storage_options Storage backend options (optional)
 /// @param schema_mode How to handle schema evolution: "overwrite" or "merge" (optional)
 /// @param target_file_size Target file size in bytes (optional)
-/// @export
 #[extendr]
 pub fn delta_write(
     table_uri: &str,
@@ -397,7 +396,6 @@ pub fn delta_write(
 /// @param description Table description (optional)
 /// @param storage_options Storage backend options (optional)
 /// @param configuration Table configuration properties (optional)
-/// @export
 #[extendr]
 pub fn delta_create(
     table_uri: &str,

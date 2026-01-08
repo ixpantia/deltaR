@@ -4,10 +4,12 @@
 \alias{load_datetime}
 \title{Load table at a specific datetime}
 \usage{
-load_datetime(table, ...)
+load_datetime(table, ..., datetime)
 }
 \arguments{
 \item{table}{A DeltaTable object.}
+
+\item{...}{Additional arguments passed to methods.}
 
 \item{datetime}{Character. ISO 8601 formatted datetime string.}
 }

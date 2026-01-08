@@ -4,10 +4,12 @@
 \alias{load_version}
 \title{Load a specific version of the table}
 \usage{
-load_version(table, ...)
+load_version(table, ..., version)
 }
 \arguments{
 \item{table}{A DeltaTable object.}
+
+\item{...}{Additional arguments passed to methods.}
 
 \item{version}{Integer. The version number to load.}
 }

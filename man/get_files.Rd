@@ -8,6 +8,8 @@ get_files(table, ...)
 }
 \arguments{
 \item{table}{A DeltaTable object.}
+
+\item{...}{Additional arguments passed to methods.}
 }
 \value{
 Character vector of file URIs.

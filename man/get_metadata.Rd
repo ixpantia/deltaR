@@ -8,6 +8,8 @@ get_metadata(table, ...)
 }
 \arguments{
 \item{table}{A DeltaTable object.}
+
+\item{...}{Additional arguments passed to methods.}
 }
 \value{
 A named list with table metadata.

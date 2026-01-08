@@ -12,15 +12,12 @@ NULL
 
 #' Register cloud storage handlers (GCS, S3, Azure) for deltalake
 #' Called from R's .onLoad to enable cloud storage support
-#' @export
 register_cloud_handlers <- function() invisible(.Call(wrap__register_cloud_handlers))
 
 #' Open a Delta Table at the specified path
-#' @export
 delta_table_open <- function(path, storage_options) .Call(wrap__delta_table_open, path, storage_options)
 
 #' Check if a path is a Delta Table
-#' @export
 is_delta_table <- function(path, storage_options) .Call(wrap__is_delta_table, path, storage_options)
 
 #' Write data to a Delta Lake table using WriteBuilder and LogicalPlan
@@ -40,7 +37,6 @@ is_delta_table <- function(path, storage_options) .Call(wrap__is_delta_table, pa
 #' @param storage_options Storage backend options (optional)
 #' @param schema_mode How to handle schema evolution: "overwrite" or "merge" (optional)
 #' @param target_file_size Target file size in bytes (optional)
-#' @export
 delta_write <- function(table_uri, stream, mode, partition_by, name, description, storage_options, schema_mode, target_file_size) .Call(wrap__delta_write, table_uri, stream, mode, partition_by, name, description, storage_options, schema_mode, target_file_size)
 
 #' Create a new empty Delta Lake table
@@ -52,7 +48,6 @@ delta_write <- function(table_uri, stream, mode, partition_by, name, description
 #' @param description Table description (optional)
 #' @param storage_options Storage backend options (optional)
 #' @param configuration Table configuration properties (optional)
-#' @export
 delta_create <- function(table_uri, schema, partition_by, name, description, storage_options, configuration) .Call(wrap__delta_create, table_uri, schema, partition_by, name, description, storage_options, configuration)
 
 DeltaTableInternal <- new.env(parent = emptyenv())

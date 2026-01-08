@@ -8,6 +8,8 @@ partition_columns(table, ...)
 }
 \arguments{
 \item{table}{A DeltaTable object.}
+
+\item{...}{Additional arguments passed to methods.}
 }
 \value{
 Character vector of partition column names.

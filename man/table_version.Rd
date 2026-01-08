@@ -9,7 +9,7 @@ table_version(table, ...)
 \arguments{
 \item{table}{A DeltaTable object.}
 
-\item{...}{Additional arguments (unused).}
+\item{...}{Additional arguments passed to methods.}
 }
 \value{
 Integer. The current version number.

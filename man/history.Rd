@@ -4,7 +4,7 @@
 \alias{history}
 \title{Get commit history}
 \usage{
-history(table, ...)
+history(table, ..., limit = NULL)
 }
 \arguments{
 \item{table}{A DeltaTable object.}

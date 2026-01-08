@@ -4,10 +4,18 @@
 \alias{vacuum}
 \title{Vacuum a Delta table}
 \usage{
-vacuum(table, ...)
+vacuum(
+  table,
+  ...,
+  retention_hours = NULL,
+  dry_run = TRUE,
+  enforce_retention_duration = TRUE
+)
 }
 \arguments{
 \item{table}{A DeltaTable object.}
+
+\item{...}{Additional arguments passed to methods.}
 
 \item{retention_hours}{Numeric. Files older than this will be removed.
 Default is 168 hours (7 days).}

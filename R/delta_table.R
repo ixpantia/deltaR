@@ -93,7 +93,7 @@ delta_table <- function(
 #' Get the current version of a Delta table
 #'
 #' @param table A DeltaTable object.
-#' @param ... Additional arguments (unused).
+#' @param ... Additional arguments passed to methods.
 #'
 #' @return Integer. The current version number.
 #'
@@ -118,6 +118,7 @@ method(table_version, DeltaTable) <- function(table, ...) {
 #' arrow, polars, or duckdb for reading.
 #'
 #' @param table A DeltaTable object.
+#' @param ... Additional arguments passed to methods.
 #'
 #' @return Character vector of file URIs.
 #'
@@ -150,6 +151,7 @@ method(get_files, DeltaTable) <- function(table) {
 #' partition columns, and configuration.
 #'
 #' @param table A DeltaTable object.
+#' @param ... Additional arguments passed to methods.
 #'
 #' @return A named list with table metadata.
 #'
@@ -172,6 +174,7 @@ method(get_metadata, DeltaTable) <- function(table) {
 #' Returns the Arrow schema of the Delta table.
 #'
 #' @param table A DeltaTable object.
+#' @param ... Additional arguments passed to methods.
 #'
 #' @return An Arrow Schema object.
 #'
@@ -199,7 +202,7 @@ method(get_schema, DeltaTable) <- function(table) {
 #' @return A data.frame with columns: version, timestamp, operation, user_id, user_name.
 #'
 #' @export
-history <- new_generic("history", "table", function(table, ...) {
+history <- new_generic("history", "table", function(table, ..., limit = NULL) {
   S7::S7_dispatch()
 })
 
@@ -217,6 +220,7 @@ method(history, DeltaTable) <- function(table, ..., limit = NULL) {
 #' Returns the partition columns of the Delta table.
 #'
 #' @param table A DeltaTable object.
+#' @param ... Additional arguments passed to methods.
 #'
 #' @return Character vector of partition column names.
 #'
@@ -244,6 +248,7 @@ method(partition_columns, DeltaTable) <- function(table) {
 #' the retention threshold.
 #'
 #' @param table A DeltaTable object.
+#' @param ... Additional arguments passed to methods.
 #' @param retention_hours Numeric. Files older than this will be removed.
 #'   Default is 168 hours (7 days).
 #' @param dry_run Logical. If TRUE, only list files that would be removed.
@@ -253,9 +258,19 @@ method(partition_columns, DeltaTable) <- function(table) {
 #' @return Character vector of files that were (or would be) removed.
 #'
 #' @export
-vacuum <- new_generic("vacuum", "table", function(table, ...) {
-  S7::S7_dispatch()
-})
+vacuum <- new_generic(
+  "vacuum",
+  "table",
+  function(
+    table,
+    ...,
+    retention_hours = NULL,
+    dry_run = TRUE,
+    enforce_retention_duration = TRUE
+  ) {
+    S7::S7_dispatch()
+  }
+)
 
 #' @export
 method(vacuum, DeltaTable) <- function(
@@ -281,14 +296,19 @@ method(vacuum, DeltaTable) <- function(
 #' Updates the DeltaTable to point to a specific version.
 #'
 #' @param table A DeltaTable object.
+#' @param ... Additional arguments passed to methods.
 #' @param version Integer. The version number to load.
 #'
 #' @return The DeltaTable object (invisibly), updated to the specified version.
 #'
 #' @export
-load_version <- new_generic("load_version", "table", function(table, ...) {
-  S7::S7_dispatch()
-})
+load_version <- new_generic(
+  "load_version",
+  "table",
+  function(table, ..., version) {
+    S7::S7_dispatch()
+  }
+)
 
 #' @export
 method(load_version, DeltaTable) <- function(table, ..., version) {
@@ -304,14 +324,19 @@ method(load_version, DeltaTable) <- function(table, ..., version) {
 #' Updates the DeltaTable to the version that was active at the specified time.
 #'
 #' @param table A DeltaTable object.
+#' @param ... Additional arguments passed to methods.
 #' @param datetime Character. ISO 8601 formatted datetime string.
 #'
 #' @return The DeltaTable object (invisibly), updated to the specified time.
 #'
 #' @export
-load_datetime <- new_generic("load_datetime", "table", function(table, ...) {
-  S7::S7_dispatch()
-})
+load_datetime <- new_generic(
+  "load_datetime",
+  "table",
+  function(table, ..., datetime) {
+    S7::S7_dispatch()
+  }
+)
 
 #' @export
 method(load_datetime, DeltaTable) <- function(table, ..., datetime) {
