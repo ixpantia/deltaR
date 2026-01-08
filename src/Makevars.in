@@ -11,10 +11,12 @@ all: $(SHLIB) rust_clean
 
 $(SHLIB): $(STATLIB)
 
+# SHORT_BASE is set dynamically by tools/config.R
+SHORT_BASE = @SHORT_BASE@
 # CARGO_HOME is set dynamically by tools/config.R
 # On Unix, this uses the current directory (no path length issues)
 CARGOTMP = @CARGO_HOME@
-VENDOR_DIR = $(CURDIR)/vendor
+VENDOR_DIR = $(SHORT_BASE)/vendor
 
 
 # RUSTFLAGS appends --print=native-static-libs to ensure that
@@ -27,7 +29,7 @@ VENDOR_DIR = $(CURDIR)/vendor
 $(STATLIB):
 
 	if [ -f ./rust/vendor.tar.xz ]; then \
-		tar xf rust/vendor.tar.xz && \
+		tar xf rust/vendor.tar.xz -C $(SHORT_BASE) && \
 		mkdir -p $(CARGOTMP) && \
 		cp rust/vendor-config.toml $(CARGOTMP)/config.toml; \
 	fi

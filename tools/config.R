@@ -36,10 +36,12 @@ if (is_windows) {
   }
 
   # Normalize to forward slashes for Make compatibility
+  .short_base <- short_base
   .target_dir <- paste0(short_base, "/target")
   .cargo_home <- paste0(short_base, "/.cargo")
   message("Using short build path: ", short_base)
 } else {
+  .short_base <- "$(CURDIR)"
   .target_dir <- "./rust/target"
   .cargo_home <- "$(CURDIR)/.cargo"
 }
@@ -143,7 +145,8 @@ new_txt <- gsub("@CRAN_FLAGS@", .cran_flags, mv_txt) |>
   gsub("@TARGET@", .target, x = _) |>
   gsub("@PANIC_EXPORTS@", .panic_exports, x = _) |>
   gsub("@TARGET_DIR@", .target_dir, x = _) |>
-  gsub("@CARGO_HOME@", .cargo_home, x = _)
+  gsub("@CARGO_HOME@", .cargo_home, x = _) |>
+  gsub("@SHORT_BASE@", .short_base, x = _)
 
 message("Writing `", mv_ofp, "`.")
 con <- file(mv_ofp, open = "wb")
