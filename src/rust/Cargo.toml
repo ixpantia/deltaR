@@ -19,7 +19,3 @@ extendr-api = { version = "0.8.1", features = ["result_condition"] }
 parking_lot = "0.12"
 tokio = { version = "1.49.0", features = ["rt"] }
 url = "2.5"
-
-[profile.release]
-lto = true
-codegen-units = 1
