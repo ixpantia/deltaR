@@ -1,6 +1,14 @@
 #' @import S7
 NULL
 
+.onLoad <- function(...) {
+  # Register cloud storage handlers (GCS, S3, Azure) for Delta Lake
+
+  register_cloud_handlers()
+
+  S7::methods_register()
+}
+
 #' DeltaTable S7 Class
 #'
 #' An S7 class representing a Delta Lake table.

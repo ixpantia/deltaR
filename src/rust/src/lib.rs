@@ -12,6 +12,19 @@ use std::collections::HashMap;
 use std::sync::Arc;
 use tokio::runtime::Runtime;
 
+/// Register cloud storage handlers (GCS, S3, Azure) for deltalake
+/// Called from R's .onLoad to enable cloud storage support
+/// @export
+#[extendr]
+fn register_cloud_handlers() {
+    // Register GCS handler
+    deltalake::gcp::register_handlers(None);
+    // Register S3 handler
+    deltalake::aws::register_handlers(None);
+    // Register Azure handler
+    deltalake::azure::register_handlers(None);
+}
+
 /// Convert a kernel DataType to an Arrow DataType
 fn kernel_type_to_arrow(kernel_type: &KernelDataType) -> ArrowDataType {
     match kernel_type {
@@ -393,6 +406,7 @@ extendr_module! {
     mod deltaR;
     use write;
     impl DeltaTableInternal;
+    fn register_cloud_handlers;
     fn delta_table_open;
     fn is_delta_table;
 }

@@ -10,6 +10,11 @@
 #' @useDynLib deltaR, .registration = TRUE
 NULL
 
+#' Register cloud storage handlers (GCS, S3, Azure) for deltalake
+#' Called from R's .onLoad to enable cloud storage support
+#' @export
+register_cloud_handlers <- function() invisible(.Call(wrap__register_cloud_handlers))
+
 #' Open a Delta Table at the specified path
 #' @export
 delta_table_open <- function(path, storage_options) .Call(wrap__delta_table_open, path, storage_options)

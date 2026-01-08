@@ -1,3 +1,6 @@
+#' @importFrom rlang abort
+NULL
+
 #' Create a DeltaTable object
 #'
 #' Opens an existing Delta Lake table at the specified path.
@@ -65,11 +68,22 @@ delta_table <- function(
   # Open the table
   internal <- delta_table_open(path, storage_options)
 
+  # Handle errors from Rust
+  if (methods::is(internal, "error")) {
+    rlang::abort(internal$value)
+  }
+
   # Time travel if requested
   if (!is.null(version)) {
-    internal$load_version(as.integer(version))
+    result <- internal$load_version(as.integer(version))
+    if (methods::is(result, "error")) {
+      rlang::abort(result$value)
+    }
   } else if (!is.null(datetime)) {
-    internal$load_datetime(datetime)
+    result <- internal$load_datetime(datetime)
+    if (methods::is(result, "error")) {
+      rlang::abort(result$value)
+    }
   }
 
   # Create and return the S7 object
@@ -90,7 +104,11 @@ table_version <- new_generic("table_version", "table", function(table, ...) {
 
 #' @export
 method(table_version, DeltaTable) <- function(table, ...) {
-  table@internal$version()
+  result <- table@internal$version()
+  if (methods::is(result, "error")) {
+    rlang::abort(result$value)
+  }
+  result
 }
 
 #' Get the list of Parquet files in the current table snapshot
@@ -119,7 +137,11 @@ get_files <- new_generic("get_files", "table", function(table, ...) {
 
 #' @export
 method(get_files, DeltaTable) <- function(table) {
-  table@internal$get_files()
+  result <- table@internal$get_files()
+  if (methods::is(result, "error")) {
+    rlang::abort(result$value)
+  }
+  result
 }
 
 #' Get table metadata
@@ -138,7 +160,11 @@ get_metadata <- new_generic("get_metadata", "table", function(table, ...) {
 
 #' @export
 method(get_metadata, DeltaTable) <- function(table) {
-  table@internal$metadata()
+  result <- table@internal$metadata()
+  if (methods::is(result, "error")) {
+    rlang::abort(result$value)
+  }
+  result
 }
 
 #' Get table schema
@@ -156,7 +182,11 @@ get_schema <- new_generic("get_schema", "table", function(table, ...) {
 
 #' @export
 method(get_schema, DeltaTable) <- function(table) {
-  table@internal$schema()
+  result <- table@internal$schema()
+  if (methods::is(result, "error")) {
+    rlang::abort(result$value)
+  }
+  result
 }
 
 #' Get commit history
@@ -175,7 +205,11 @@ history <- new_generic("history", "table", function(table, ...) {
 
 #' @export
 method(history, DeltaTable) <- function(table, ..., limit = NULL) {
-  table@internal$history(limit)
+  result <- table@internal$history(limit)
+  if (methods::is(result, "error")) {
+    rlang::abort(result$value)
+  }
+  result
 }
 
 #' Get partition columns
@@ -197,7 +231,11 @@ partition_columns <- new_generic(
 
 #' @export
 method(partition_columns, DeltaTable) <- function(table) {
-  table@internal$partition_columns()
+  result <- table@internal$partition_columns()
+  if (methods::is(result, "error")) {
+    rlang::abort(result$value)
+  }
+  result
 }
 
 #' Vacuum a Delta table
@@ -227,7 +265,15 @@ method(vacuum, DeltaTable) <- function(
   dry_run = TRUE,
   enforce_retention_duration = TRUE
 ) {
-  table@internal$vacuum(retention_hours, dry_run, enforce_retention_duration)
+  result <- table@internal$vacuum(
+    retention_hours,
+    dry_run,
+    enforce_retention_duration
+  )
+  if (methods::is(result, "error")) {
+    rlang::abort(result$value)
+  }
+  result
 }
 
 #' Load a specific version of the table
@@ -246,7 +292,10 @@ load_version <- new_generic("load_version", "table", function(table, ...) {
 
 #' @export
 method(load_version, DeltaTable) <- function(table, ..., version) {
-  table@internal$load_version(as.integer(version))
+  result <- table@internal$load_version(as.integer(version))
+  if (methods::is(result, "error")) {
+    rlang::abort(result$value)
+  }
   invisible(table)
 }
 
@@ -266,7 +315,10 @@ load_datetime <- new_generic("load_datetime", "table", function(table, ...) {
 
 #' @export
 method(load_datetime, DeltaTable) <- function(table, ..., datetime) {
-  table@internal$load_datetime(datetime)
+  result <- table@internal$load_datetime(datetime)
+  if (methods::is(result, "error")) {
+    rlang::abort(result$value)
+  }
   invisible(table)
 }
 
@@ -280,5 +332,9 @@ method(load_datetime, DeltaTable) <- function(table, ..., datetime) {
 #'
 #' @export
 is_delta_table_path <- function(path, storage_options = NULL) {
-  is_delta_table(path, storage_options)
+  result <- is_delta_table(path, storage_options)
+  if (methods::is(result, "error")) {
+    rlang::abort(result$value)
+  }
+  result
 }
