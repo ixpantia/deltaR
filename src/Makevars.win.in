@@ -1,6 +1,8 @@
 TARGET = $(subst 64,x86_64,$(subst 32,i686,$(WIN)))-pc-windows-gnu
 
-TARGET_DIR = ./rust/target
+# TARGET_DIR is set dynamically by tools/config.R to use a short path
+# This avoids Windows MAX_PATH (260 char) limitations with aws-lc-sys
+TARGET_DIR = @TARGET_DIR@
 LIBDIR = $(TARGET_DIR)/$(TARGET)/@LIBDIR@
 STATLIB = $(LIBDIR)/libdeltaR.a
 PKG_LIBS = -L$(LIBDIR) -ldeltaR -lws2_32 -ladvapi32 -luserenv -lbcrypt -lntdll

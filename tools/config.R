@@ -4,6 +4,21 @@
 # check the packages MSRV first
 source("tools/msrv.R")
 
+# check if we are on Windows
+is_windows <- .Platform[["OS.type"]] == "windows"
+
+# Generate a short target directory for Windows to avoid MAX_PATH issues
+# aws-lc-sys builds fail when paths exceed ~250 characters
+if (is_windows) {
+  # Use R's temp directory but with a short subdirectory name
+  # This is CRAN-compliant as it uses the session temp directory
+  short_tmp <- file.path(tempdir(), "dR")
+  # Normalize to forward slashes for Make compatibility
+  .target_dir <- gsub("\\\\", "/", short_tmp)
+} else {
+  .target_dir <- "./rust/target"
+}
+
 # check DEBUG and NOT_CRAN environment variables
 env_debug <- Sys.getenv("DEBUG")
 env_not_cran <- Sys.getenv("NOT_CRAN")
@@ -71,7 +86,6 @@ cfg <- if (is_debug) "debug" else "release"
 )
 
 # read in the Makevars.in file checking
-is_windows <- .Platform[["OS.type"]] == "windows"
 
 # if windows we replace in the Makevars.win.in
 mv_fp <- ifelse(
@@ -102,7 +116,8 @@ new_txt <- gsub("@CRAN_FLAGS@", .cran_flags, mv_txt) |>
   gsub("@CLEAN_TARGET@", .clean_targets, x = _) |>
   gsub("@LIBDIR@", .libdir, x = _) |>
   gsub("@TARGET@", .target, x = _) |>
-  gsub("@PANIC_EXPORTS@", .panic_exports, x = _)
+  gsub("@PANIC_EXPORTS@", .panic_exports, x = _) |>
+  gsub("@TARGET_DIR@", .target_dir, x = _)
 
 message("Writing `", mv_ofp, "`.")
 con <- file(mv_ofp, open = "wb")

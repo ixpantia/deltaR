@@ -1,4 +1,6 @@
-TARGET_DIR = ./rust/target
+# TARGET_DIR is set dynamically by tools/config.R
+# On Windows, this uses a short path to avoid MAX_PATH limitations
+TARGET_DIR = @TARGET_DIR@
 LIBDIR = $(TARGET_DIR)/@LIBDIR@
 STATLIB = $(LIBDIR)/libdeltaR.a
 PKG_LIBS = -L$(LIBDIR) -ldeltaR
