@@ -324,6 +324,9 @@ Made with ❤️ by [ixpantia](https://www.ixpantia.com/)
   : Load a specific version of the table
 - [`partition_columns()`](https://ixpantia.github.io/deltaR/reference/partition_columns.md)
   : Get partition columns
+- [`register_cloud_handlers()`](https://ixpantia.github.io/deltaR/reference/register_cloud_handlers.md)
+  : Register cloud storage handlers (GCS, S3, Azure) for deltalake
+  Called from R's .onLoad to enable cloud storage support
 - [`table_version()`](https://ixpantia.github.io/deltaR/reference/table_version.md)
   : Get the current version of a Delta table
 - [`vacuum()`](https://ixpantia.github.io/deltaR/reference/vacuum.md) :
