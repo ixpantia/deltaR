@@ -54,8 +54,7 @@ write_deltalake(df, "path/to/my_table")
 
 # Append more data
 new_data <- data.frame(
-
-id = 1001:1100,
+  id = 1001:1100,
   name = sample(letters, 100, replace = TRUE),
   value = runif(100),
   date = as.Date("2025-01-01") + sample(0:30, 100, replace = TRUE)
