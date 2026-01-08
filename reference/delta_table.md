@@ -1,0 +1,73 @@
+# Create a DeltaTable object
+
+Opens an existing Delta Lake table at the specified path.
+
+## Usage
+
+``` r
+delta_table(path, version = NULL, datetime = NULL, storage_options = NULL)
+```
+
+## Arguments
+
+- path:
+
+  Character. Path to the Delta table (local filesystem or cloud storage
+  URI).
+
+- version:
+
+  Optional integer. Load a specific version of the table.
+
+- datetime:
+
+  Optional character. Load the table at a specific point in time (ISO
+  8601 format).
+
+- storage_options:
+
+  Optional named list. Storage backend options (e.g., AWS credentials).
+
+## Value
+
+A DeltaTable S7 object.
+
+## Examples
+
+``` r
+if (FALSE) { # \dontrun{
+# Open a local Delta table
+dt <- delta_table("path/to/delta_table")
+
+# Open at a specific version
+dt <- delta_table("path/to/delta_table", version = 5)
+
+# Open at a specific datetime
+dt <- delta_table("path/to/delta_table", datetime = "2024-01-01T00:00:00Z")
+
+# Open a Google Cloud Storage Delta table
+dt <- delta_table(
+  "gs://my-bucket/path/to/table",
+  storage_options = list(google_service_account_path = "path/to/key.json")
+)
+
+# Open an S3 Delta table
+dt <- delta_table(
+  "s3://my-bucket/path/to/table",
+  storage_options = list(
+    aws_access_key_id = "MY_ACCESS_KEY",
+    aws_secret_access_key = "MY_SECRET_KEY",
+    aws_region = "us-east-1"
+  )
+)
+
+# Open an Azure Blob Storage Delta table
+dt <- delta_table(
+  "az://my-container/path/to/table",
+  storage_options = list(
+    azure_storage_account_name = "MY_ACCOUNT_NAME",
+    azure_storage_account_key = "MY_ACCOUNT_KEY"
+  )
+)
+} # }
+```

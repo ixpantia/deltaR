@@ -1,0 +1,373 @@
+# Getting Started with deltaR
+
+## Introduction
+
+deltaR provides an R interface to [Delta Lake](https://delta.io/), the
+open-source storage layer that brings ACID transactions to data lakes.
+Built on the high-performance
+[delta-rs](https://github.com/delta-io/delta-rs) Rust library, deltaR
+enables you to read and write Delta tables directly from R with minimal
+overhead.
+
+### What is Delta Lake?
+
+Delta Lake is an open-source storage framework that enables building a
+lakehouse architecture. Key features include:
+
+- **ACID Transactions**: Ensures data integrity even with concurrent
+  reads and writes
+- **Time Travel**: Access and restore previous versions of your data
+- **Schema Enforcement**: Prevents bad data from being written
+- **Schema Evolution**: Allows schema changes over time
+- **Scalable Metadata**: Handles petabyte-scale tables with billions of
+  files
+
+## Installation
+
+### Prerequisites
+
+deltaR requires the Rust toolchain to compile from source:
+
+``` r
+# On macOS/Linux, install Rust via rustup:
+# curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+
+# On Windows, download and run rustup-init.exe from https://rustup.rs/
+```
+
+### Install deltaR
+
+``` r
+# Install from GitHub
+remotes::install_github("ixpantia/deltaR")
+```
+
+## Writing Data to Delta Tables
+
+The primary function for writing data is
+[`write_deltalake()`](https://ixpantia.github.io/deltaR/reference/write_deltalake.md).
+It accepts data frames, Arrow tables, or any object that can be
+converted to an Arrow stream.
+
+``` r
+library(deltaR)
+```
+
+### Creating a New Table
+
+``` r
+# Create sample data
+sales_data <- data.frame(
+  order_id = 1:100,
+  customer_id = sample(1:20, 100, replace = TRUE),
+  product = sample(c("Widget", "Gadget", "Gizmo"), 100, replace = TRUE),
+  quantity = sample(1:10, 100, replace = TRUE),
+  price = round(runif(100, 10, 500), 2),
+  order_date = as.Date("2024-01-01") + sample(0:364, 100, replace = TRUE)
+)
+
+# Write to a Delta table
+write_deltalake(sales_data, "path/to/sales_table")
+```
+
+### Write Modes
+
+deltaR supports four write modes:
+
+``` r
+# error (default): Fail if the table already exists
+write_deltalake(sales_data, "path/to/table", mode = "error")
+
+# append: Add new data to an existing table
+new_sales <- data.frame(
+  order_id = 101:110,
+  customer_id = sample(1:20, 10, replace = TRUE),
+  product = sample(c("Widget", "Gadget", "Gizmo"), 10, replace = TRUE),
+  quantity = sample(1:10, 10, replace = TRUE),
+  price = round(runif(10, 10, 500), 2),
+  order_date = as.Date("2025-01-01") + sample(0:30, 10, replace = TRUE)
+)
+write_deltalake(new_sales, "path/to/sales_table", mode = "append")
+
+# overwrite: Replace all data in the table
+write_deltalake(sales_data, "path/to/sales_table", mode = "overwrite")
+
+# ignore: Do nothing if the table already exists
+write_deltalake(sales_data, "path/to/table", mode = "ignore")
+```
+
+### Partitioned Tables
+
+Partitioning improves query performance by organizing data into
+directories based on column values:
+
+``` r
+# Partition by date and product
+write_deltalake(
+  sales_data,
+  "path/to/partitioned_sales",
+  partition_by = c("order_date", "product")
+)
+```
+
+When you query a partitioned table with filters on partition columns,
+Delta Lake can skip reading irrelevant partitions entirely.
+
+### Controlling File Size
+
+For large datasets, you can control the target size of output files:
+
+``` r
+# Target 128 MB files
+write_deltalake(
+  large_dataset,
+  "path/to/table",
+  target_file_size = 128 * 1024 * 1024
+)
+```
+
+## Reading Delta Tables
+
+### Opening a Table
+
+Use
+[`delta_table()`](https://ixpantia.github.io/deltaR/reference/delta_table.md)
+to open an existing Delta table:
+
+``` r
+# Open a Delta table
+dt <- delta_table("path/to/sales_table")
+
+# Get basic information
+dt$version()
+dt$num_files()
+```
+
+### Table Metadata
+
+``` r
+# View the schema
+dt$schema()
+
+# Get table metadata (name, description, etc.)
+dt$metadata()
+
+# List partition columns
+dt$partition_columns()
+
+# List all files in the table
+dt$get_files()
+```
+
+### Reading Data
+
+``` r
+# Read as an Arrow Table (recommended for large data)
+arrow_table <- dt$to_arrow()
+
+# Read as a data.frame (convenient for small data)
+df <- dt$to_data_frame()
+
+# Read with a filter using dplyr
+library(dplyr)
+
+high_value_orders <- dt$to_arrow() |>
+  filter(price > 200) |>
+  select(order_id, customer_id, price) |>
+  collect()
+```
+
+## Time Travel
+
+One of Delta Lake’s most powerful features is the ability to access
+historical versions of your data.
+
+### Viewing History
+
+``` r
+# View the commit history
+history <- dt$history()
+print(history)
+
+# Limit the number of history entries
+recent_history <- dt$history(limit = 5)
+```
+
+### Loading Previous Versions
+
+``` r
+# Load a specific version
+dt$load_version(2)
+
+# Read data from that version
+old_data <- dt$to_data_frame()
+
+# Load data as of a specific timestamp
+dt$load_datetime("2024-06-15T10:30:00Z")
+```
+
+### Use Cases for Time Travel
+
+- **Auditing**: Review data at any point in time
+- **Debugging**: Compare current data with previous versions
+- **Recovery**: Restore accidentally deleted or modified data
+- **Reproducibility**: Run analyses on historical snapshots
+
+## Schema Evolution
+
+Delta Lake supports schema evolution, allowing you to add new columns or
+change the schema over time.
+
+### Adding New Columns
+
+``` r
+# Original data
+df1 <- data.frame(id = 1:5, name = letters[1:5])
+write_deltalake(df1, "path/to/evolving_table")
+
+# New data with an additional column
+df2 <- data.frame(
+  id = 6:10,
+  name = letters[6:10],
+  score = runif(5)
+)
+
+# Use schema_mode = "merge" to add the new column
+write_deltalake(
+  df2,
+  "path/to/evolving_table",
+  mode = "append",
+  schema_mode = "merge"
+)
+```
+
+### Overwriting the Schema
+
+``` r
+# Completely replace the schema
+new_structure <- data.frame(
+  user_id = 1:5,
+  email = paste0(letters[1:5], "@example.com")
+)
+
+write_deltalake(
+  new_structure,
+  "path/to/table",
+  mode = "overwrite",
+  schema_mode = "overwrite"
+)
+```
+
+## Table Maintenance
+
+### Vacuum
+
+Over time, Delta tables accumulate old files from previous versions. The
+[`vacuum()`](https://ixpantia.github.io/deltaR/reference/vacuum.md)
+function removes files that are no longer needed:
+
+``` r
+dt <- delta_table("path/to/sales_table")
+
+# Dry run - see what would be deleted
+files_to_delete <- dt$vacuum(retention_hours = 168, dry_run = TRUE)
+print(files_to_delete)
+
+# Actually delete old files (default retention is 7 days = 168 hours)
+dt$vacuum(retention_hours = 168, dry_run = FALSE)
+```
+
+**Warning**: Vacuuming removes the ability to time travel to versions
+older than the retention period. Choose your retention period carefully
+based on your needs.
+
+## Creating Empty Tables
+
+You can create an empty Delta table with a predefined schema:
+
+``` r
+# Define schema using nanoarrow
+schema <- nanoarrow::na_struct(list(
+  id = nanoarrow::na_int64(),
+  name = nanoarrow::na_string(),
+  value = nanoarrow::na_double(),
+  created_at = nanoarrow::na_timestamp("us", timezone = "UTC")
+))
+
+# Create the table
+create_deltalake(
+  "path/to/new_table",
+  schema,
+  name = "my_table",
+  description = "A table for storing important data"
+)
+```
+
+## Checking if a Path is a Delta Table
+
+``` r
+# Check if a path contains a Delta table
+is_delta_table_path("path/to/sales_table")
+
+is_delta_table_path("path/to/regular_folder")
+```
+
+## Best Practices
+
+### 1
+
+. Choose Appropriate Partition Columns
+
+- Partition on columns frequently used in filters
+- Avoid high-cardinality columns (too many unique values)
+- Consider date-based partitioning for time-series data
+
+### 2. Use Arrow for Large Data
+
+``` r
+# Instead of loading everything into memory:
+# df <- dt$to_data_frame()
+
+# Use Arrow for filtering and aggregation:
+result <- dt$to_arrow() |>
+  dplyr::filter(order_date >= as.Date("2024-06-01")) |>
+  dplyr::summarise(total_sales = sum(price)) |>
+  dplyr::collect()
+```
+
+### 3. Regular Maintenance
+
+- Run
+  [`vacuum()`](https://ixpantia.github.io/deltaR/reference/vacuum.md)
+  periodically to clean up old files
+- Monitor table size and file count
+- Consider compaction for tables with many small files
+
+### 4. Use Meaningful Table Names and Descriptions
+
+``` r
+write_deltalake(
+  sales_data,
+  "path/to/sales_table",
+  name = "daily_sales",
+  description = "Daily sales transactions from all stores"
+)
+```
+
+## Next Steps
+
+- Read the [Cloud Storage
+  Guide](https://ixpantia.github.io/deltaR/articles/cloud-storage.md) to
+  learn about using deltaR with S3, GCS, and Azure
+- Explore the [Function
+  Reference](https://ixpantia.github.io/deltaR/reference/index.md) for
+  detailed API documentation
+- Visit the [Delta Lake documentation](https://docs.delta.io/) for more
+  about the Delta Lake format
+
+## Acknowledgments
+
+deltaR is built on the excellent
+[delta-rs](https://github.com/delta-io/delta-rs) Rust library. We are
+grateful to the delta-rs maintainers and the broader Delta Lake
+community for their work.
