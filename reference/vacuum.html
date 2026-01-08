@@ -47,7 +47,13 @@ the retention threshold.</p>
 
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">vacuum</span><span class="op">(</span><span class="va">table</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">vacuum</span><span class="op">(</span></span>
+<span>  <span class="va">table</span>,</span>
+<span>  <span class="va">...</span>,</span>
+<span>  retention_hours <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  dry_run <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  enforce_retention_duration <span class="op">=</span> <span class="cn">TRUE</span></span>
+<span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
@@ -56,6 +62,10 @@ the retention threshold.</p>
 
 <dl><dt id="arg-table">table<a class="anchor" aria-label="anchor" href="#arg-table"></a></dt>
 <dd><p>A DeltaTable object.</p></dd>
+
+
+<dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>
+<dd><p>Additional arguments passed to methods.</p></dd>
 
 
 <dt id="arg-retention-hours">retention_hours<a class="anchor" aria-label="anchor" href="#arg-retention-hours"></a></dt>

@@ -6,7 +6,7 @@ time.
 ## Usage
 
 ``` r
-load_datetime(table, ...)
+load_datetime(table, ..., datetime)
 ```
 
 ## Arguments
@@ -14,6 +14,10 @@ load_datetime(table, ...)
 - table:
 
   A DeltaTable object.
+
+- ...:
+
+  Additional arguments passed to methods.
 
 - datetime:
 

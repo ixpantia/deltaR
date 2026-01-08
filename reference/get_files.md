@@ -16,6 +16,10 @@ get_files(table, ...)
 
   A DeltaTable object.
 
+- ...:
+
+  Additional arguments passed to methods.
+
 ## Value
 
 Character vector of file URIs.

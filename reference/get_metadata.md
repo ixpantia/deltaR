@@ -15,6 +15,10 @@ get_metadata(table, ...)
 
   A DeltaTable object.
 
+- ...:
+
+  Additional arguments passed to methods.
+
 ## Value
 
 A named list with table metadata.

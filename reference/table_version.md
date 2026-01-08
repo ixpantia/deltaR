@@ -16,7 +16,7 @@ table_version(table, ...)
 
 - ...:
 
-  Additional arguments (unused).
+  Additional arguments passed to methods.
 
 ## Value
 

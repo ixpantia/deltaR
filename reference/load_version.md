@@ -5,7 +5,7 @@ Updates the DeltaTable to point to a specific version.
 ## Usage
 
 ``` r
-load_version(table, ...)
+load_version(table, ..., version)
 ```
 
 ## Arguments
@@ -13,6 +13,10 @@ load_version(table, ...)
 - table:
 
   A DeltaTable object.
+
+- ...:
+
+  Additional arguments passed to methods.
 
 - version:
 

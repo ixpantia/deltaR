@@ -6,7 +6,13 @@ the retention threshold.
 ## Usage
 
 ``` r
-vacuum(table, ...)
+vacuum(
+  table,
+  ...,
+  retention_hours = NULL,
+  dry_run = TRUE,
+  enforce_retention_duration = TRUE
+)
 ```
 
 ## Arguments
@@ -14,6 +20,10 @@ vacuum(table, ...)
 - table:
 
   A DeltaTable object.
+
+- ...:
+
+  Additional arguments passed to methods.
 
 - retention_hours:
 

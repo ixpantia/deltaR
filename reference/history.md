@@ -5,7 +5,7 @@ Returns the commit history of the Delta table.
 ## Usage
 
 ``` r
-history(table, ...)
+history(table, ..., limit = NULL)
 ```
 
 ## Arguments

@@ -14,6 +14,10 @@ get_schema(table, ...)
 
   A DeltaTable object.
 
+- ...:
+
+  Additional arguments passed to methods.
+
 ## Value
 
 An Arrow Schema object.
