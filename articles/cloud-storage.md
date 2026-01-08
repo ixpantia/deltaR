@@ -276,13 +276,15 @@ s3_options <- list(
 )
 
 # Read source data
+# Read from S3 using arrow
 source_dt <- delta_table(
   "s3://data-lake/bronze/raw_events",
   storage_options = s3_options
 )
 
-# Transform data
-transformed_data <- source_dt$to_arrow() |>
+# Get file paths and read with arrow, then transform
+files <- get_files(source_dt)
+transformed_data <- arrow::open_dataset(files) |>
   filter(event_type == "purchase") |>
   mutate(
     event_date = as.Date(event_timestamp),
@@ -366,12 +368,13 @@ azure_options <- list(
   azure_storage_account_key = Sys.getenv("AZURE_STORAGE_KEY")
 )
 
-# Read from S3
+# Read from S3 using arrow
 source_dt <- delta_table(
   "s3://source-bucket/important_data",
   storage_options = s3_options
 )
-data <- source_dt$to_arrow()
+files <- get_files(source_dt)
+data <- arrow::open_dataset(files) |> dplyr::collect()
 
 # Write to Azure
 write_deltalake(

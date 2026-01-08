@@ -9,8 +9,8 @@ overhead.
 
 ## Features
 
-- 📖 **Read Delta tables** - Query Delta tables as Arrow tables or data
-  frames
+- 📖 **Read Delta tables** - Get file paths to use with arrow, polars,
+  or duckdb
 - ✍️ **Write Delta tables** - Create and append to Delta tables with
   full ACID guarantees
 - ⏰ **Time travel** - Access historical versions of your data
@@ -28,8 +28,8 @@ overhead.
 ### Prerequisites
 
 deltaR requires the Rust toolchain to compile from source: - **Rust**
-\>= 1.65.0 ([Install Rust](https://rustup.rs/)) - **Cargo** (included
-with Rust)
+\>= 1.88 ([Install Rust](https://rustup.rs/)) - **Cargo** (included with
+Rust)
 
 ### Install from GitHub
 
@@ -61,8 +61,7 @@ write_deltalake(df, "path/to/my_table")
 
 # Append more data
 new_data <- data.frame(
-
-id = 1001:1100,
+  id = 1001:1100,
   name = sample(letters, 100, replace = TRUE),
   value = runif(100),
   date = as.Date("2025-01-01") + sample(0:30, 100, replace = TRUE)
@@ -75,41 +74,60 @@ write_deltalake(df, "path/to/my_table", mode = "overwrite")
 
 ### Reading Data
 
+deltaR delegates the actual reading of data to other libraries like
+arrow, polars, or duckdb. Use
+[`get_files()`](https://ixpantia.github.io/deltaR/reference/get_files.md)
+to get the Parquet file paths from the current table version:
+
 ``` r
 # Open a Delta table
 dt <- delta_table("path/to/my_table")
 
 # Get table information
-dt$version()
-dt$schema()
-dt$num_files()
+table_version(dt)
+get_schema(dt)
 
-# Read as Arrow Table
-arrow_table <- dt$to_arrow()
+# Get the list of Parquet files in the current snapshot
+files <- get_files(dt)
 
-# Read as data.frame
-df <- dt$to_data_frame()
+# Read with arrow
+library(arrow)
+arrow_table <- open_dataset(files)
+df <- arrow_table |> collect()
 
-# Read with dplyr
+# Read with dplyr and arrow
 library(dplyr)
-dt$to_arrow() |>
+arrow_table |>
   filter(value > 0.5) |>
   group_by(name) |>
   summarise(total = sum(value)) |>
   collect()
+
+# Read with polars
+library(polars)
+pl_df <- pl$scan_parquet(files)$collect()
+
+# Read with duckdb
+library(duckdb)
+con <- dbConnect(duckdb())
+result <- dbGetQuery(con, sprintf("SELECT * FROM read_parquet(%s)", 
+                                   paste0("['", paste(files, collapse = "','"), "']")))
 ```
 
 ### Time Travel
 
 ``` r
 # Load a specific version
-dt$load_version(5)
+load_version(dt, version = 5)
 
 # Load data as of a specific timestamp
-dt$load_datetime("2024-06-15T10:30:00Z")
+load_datetime(dt, datetime = "2024-06-15T10:30:00Z")
 
 # View table history
-dt$history()
+history(dt)
+
+# After time travel, get_files() returns files from that version
+files <- get_files(dt)
 ```
 
 ### Partitioned Tables
@@ -200,10 +218,10 @@ Remove old files no longer referenced by the Delta table:
 dt <- delta_table("path/to/table")
 
 # Dry run - see what would be deleted
-dt$vacuum(retention_hours = 168, dry_run = TRUE)
+vacuum(dt, retention_hours = 168, dry_run = TRUE)
 
 # Actually delete old files
-dt$vacuum(retention_hours = 168, dry_run = FALSE)
+vacuum(dt, retention_hours = 168, dry_run = FALSE)
 ```
 
 ## Performance Tips
@@ -212,8 +230,8 @@ dt$vacuum(retention_hours = 168, dry_run = FALSE)
     by specific columns
 2.  **Set `target_file_size`** to control output file sizes for better
     read performance
-3.  **Use Arrow** for downstream processing instead of converting to
-    data.frame
+3.  **Use Arrow or Polars** for downstream processing instead of
+    converting to data.frame
 4.  **Vacuum regularly** to remove old files and reduce storage costs
 
 ``` r
@@ -238,17 +256,14 @@ write_deltalake(
 
 deltaR is built on the shoulders of giants:
 
-- **[delta-rs](https://github.com/delta-io/delta-rs)** - The Rust
-  implementation of Delta Lake that powers this package. We are grateful
-  to the delta-rs maintainers and contributors for their excellent work.
-- **[Delta Lake](https://delta.io/)** - The open-source storage layer
-  that brings reliability to data lakes.
-- **[Apache Arrow](https://arrow.apache.org/)** - The columnar memory
-  format that enables high-performance data interchange.
-- **[extendr](https://extendr.github.io/)** - The framework that makes
-  it possible to call Rust from R.
-- **[nanoarrow](https://github.com/apache/arrow-nanoarrow)** -
-  Lightweight Arrow implementation for R.
+- **[delta-rs](https://github.com/delta-io/delta-rs)**
+- **[Delta Lake](https://delta.io/)**
+- **[Apache Arrow](https://arrow.apache.org/)**
+- **[extendr](https://extendr.github.io/)** - Thanks to CGMossa and the
+  extendr contributors for making Rust + R a reality
+- **[arrow-extendr](https://github.com/extendr/arrow-extendr)** - Thanks
+  to @JosiahParry for the Arrow bindings that make this all work
+  together
 
 ## Contributing
 
@@ -264,6 +279,8 @@ This project is licensed under the Apache License 2.0 - see the
 ## Related Projects
 
 - [arrow](https://arrow.apache.org/docs/r/) - R package for Apache Arrow
+- [polars](https://pola-rs.github.io/r-polars/) - R interface for Polars
+  (can read Delta tables)
 - [duckdb](https://duckdb.org/docs/api/r) - DuckDB R API (can read Delta
   tables)
 - [sparklyr](https://spark.rstudio.com/) - R interface for Apache Spark

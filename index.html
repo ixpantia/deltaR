@@ -22,7 +22,7 @@
 
     <a class="navbar-brand me-2" href="index.html">deltaR</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.0.9000</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -63,7 +63,7 @@
 <h2 id="features">Features<a class="anchor" aria-label="anchor" href="#features"></a>
 </h2>
 <ul>
-<li>📖 <strong>Read Delta tables</strong> - Query Delta tables as Arrow tables or data frames</li>
+<li>📖 <strong>Read Delta tables</strong> - Get file paths to use with arrow, polars, or duckdb</li>
 <li>✍️ <strong>Write Delta tables</strong> - Create and append to Delta tables with full ACID guarantees</li>
 <li>⏰ <strong>Time travel</strong> - Access historical versions of your data</li>
 <li>🔄 <strong>Schema evolution</strong> - Merge or overwrite schemas as your data evolves</li>
@@ -78,7 +78,7 @@
 <div class="section level3">
 <h3 id="prerequisites">Prerequisites<a class="anchor" aria-label="anchor" href="#prerequisites"></a>
 </h3>
-<p>deltaR requires the Rust toolchain to compile from source: - <strong>Rust</strong> &gt;= 1.65.0 (<a href="https://rustup.rs/" class="external-link">Install Rust</a>) - <strong>Cargo</strong> (included with Rust)</p>
+<p>deltaR requires the Rust toolchain to compile from source: - <strong>Rust</strong> &gt;= 1.88 (<a href="https://rustup.rs/" class="external-link">Install Rust</a>) - <strong>Cargo</strong> (included with Rust)</p>
 </div>
 <div class="section level3">
 <h3 id="install-from-github">Install from GitHub<a class="anchor" aria-label="anchor" href="#install-from-github"></a>
@@ -113,8 +113,7 @@
 <span></span>
 <span><span class="co"># Append more data</span></span>
 <span><span class="va">new_data</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span>
-<span></span>
-<span>id <span class="op">=</span> <span class="fl">1001</span><span class="op">:</span><span class="fl">1100</span>,</span>
+<span>  id <span class="op">=</span> <span class="fl">1001</span><span class="op">:</span><span class="fl">1100</span>,</span>
 <span>  name <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sample.html" class="external-link">sample</a></span><span class="op">(</span><span class="va">letters</span>, <span class="fl">100</span>, replace <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>,</span>
 <span>  value <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html" class="external-link">runif</a></span><span class="op">(</span><span class="fl">100</span><span class="op">)</span>,</span>
 <span>  date <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/as.Date.html" class="external-link">as.Date</a></span><span class="op">(</span><span class="st">"2025-01-01"</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/base/sample.html" class="external-link">sample</a></span><span class="op">(</span><span class="fl">0</span><span class="op">:</span><span class="fl">30</span>, <span class="fl">100</span>, replace <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
@@ -127,41 +126,56 @@
 <div class="section level3">
 <h3 id="reading-data">Reading Data<a class="anchor" aria-label="anchor" href="#reading-data"></a>
 </h3>
+<p>deltaR delegates the actual reading of data to other libraries like arrow, polars, or duckdb. Use <code><a href="reference/get_files.html">get_files()</a></code> to get the Parquet file paths from the current table version:</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Open a Delta table</span></span>
 <span><span class="va">dt</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/delta_table.html">delta_table</a></span><span class="op">(</span><span class="st">"path/to/my_table"</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Get table information</span></span>
-<span><span class="va">dt</span><span class="op">$</span><span class="fu">version</span><span class="op">(</span><span class="op">)</span></span>
-<span><span class="va">dt</span><span class="op">$</span><span class="fu">schema</span><span class="op">(</span><span class="op">)</span></span>
-<span><span class="va">dt</span><span class="op">$</span><span class="fu">num_files</span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="fu"><a href="reference/table_version.html">table_version</a></span><span class="op">(</span><span class="va">dt</span><span class="op">)</span></span>
+<span><span class="fu"><a href="reference/get_schema.html">get_schema</a></span><span class="op">(</span><span class="va">dt</span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># Read as Arrow Table</span></span>
-<span><span class="va">arrow_table</span> <span class="op">&lt;-</span> <span class="va">dt</span><span class="op">$</span><span class="fu">to_arrow</span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="co"># Get the list of Parquet files in the current snapshot</span></span>
+<span><span class="va">files</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/get_files.html">get_files</a></span><span class="op">(</span><span class="va">dt</span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># Read as data.frame</span></span>
-<span><span class="va">df</span> <span class="op">&lt;-</span> <span class="va">dt</span><span class="op">$</span><span class="fu">to_data_frame</span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="co"># Read with arrow</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/apache/arrow/" class="external-link">arrow</a></span><span class="op">)</span></span>
+<span><span class="va">arrow_table</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://arrow.apache.org/docs/r/reference/open_dataset.html" class="external-link">open_dataset</a></span><span class="op">(</span><span class="va">files</span><span class="op">)</span></span>
+<span><span class="va">df</span> <span class="op">&lt;-</span> <span class="va">arrow_table</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/compute.html" class="external-link">collect</a></span><span class="op">(</span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># Read with dplyr</span></span>
+<span><span class="co"># Read with dplyr and arrow</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org" class="external-link">dplyr</a></span><span class="op">)</span></span>
-<span><span class="va">dt</span><span class="op">$</span><span class="fu">to_arrow</span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span><span class="va">arrow_table</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">value</span> <span class="op">&gt;</span> <span class="fl">0.5</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by</a></span><span class="op">(</span><span class="va">name</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/summarise.html" class="external-link">summarise</a></span><span class="op">(</span>total <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">value</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/compute.html" class="external-link">collect</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/compute.html" class="external-link">collect</a></span><span class="op">(</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Read with polars</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">polars</span><span class="op">)</span></span>
+<span><span class="va">pl_df</span> <span class="op">&lt;-</span> <span class="va">pl</span><span class="op">$</span><span class="fu">scan_parquet</span><span class="op">(</span><span class="va">files</span><span class="op">)</span><span class="op">$</span><span class="fu">collect</span><span class="op">(</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Read with duckdb</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://r.duckdb.org/" class="external-link">duckdb</a></span><span class="op">)</span></span>
+<span><span class="va">con</span> <span class="op">&lt;-</span> <span class="fu">dbConnect</span><span class="op">(</span><span class="fu">duckdb</span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">result</span> <span class="op">&lt;-</span> <span class="fu">dbGetQuery</span><span class="op">(</span><span class="va">con</span>, <span class="fu"><a href="https://rdrr.io/r/base/sprintf.html" class="external-link">sprintf</a></span><span class="op">(</span><span class="st">"SELECT * FROM read_parquet(%s)"</span>, </span>
+<span>                                   <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="st">"['"</span>, <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste</a></span><span class="op">(</span><span class="va">files</span>, collapse <span class="op">=</span> <span class="st">"','"</span><span class="op">)</span>, <span class="st">"']"</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="time-travel">Time Travel<a class="anchor" aria-label="anchor" href="#time-travel"></a>
 </h3>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Load a specific version</span></span>
-<span><span class="va">dt</span><span class="op">$</span><span class="fu">load_version</span><span class="op">(</span><span class="fl">5</span><span class="op">)</span></span>
+<span><span class="fu"><a href="reference/load_version.html">load_version</a></span><span class="op">(</span><span class="va">dt</span>, version <span class="op">=</span> <span class="fl">5</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Load data as of a specific timestamp</span></span>
-<span><span class="va">dt</span><span class="op">$</span><span class="fu">load_datetime</span><span class="op">(</span><span class="st">"2024-06-15T10:30:00Z"</span><span class="op">)</span></span>
+<span><span class="fu"><a href="reference/load_datetime.html">load_datetime</a></span><span class="op">(</span><span class="va">dt</span>, datetime <span class="op">=</span> <span class="st">"2024-06-15T10:30:00Z"</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># View table history</span></span>
-<span><span class="va">dt</span><span class="op">$</span><span class="fu">history</span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu"><a href="reference/history.html">history</a></span><span class="op">(</span><span class="va">dt</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># After time travel, get_files() returns files from that version</span></span>
+<span><span class="va">files</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/get_files.html">get_files</a></span><span class="op">(</span><span class="va">dt</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="partitioned-tables">Partitioned Tables<a class="anchor" aria-label="anchor" href="#partitioned-tables"></a>
@@ -288,10 +302,10 @@
 <code class="sourceCode R"><span><span class="va">dt</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/delta_table.html">delta_table</a></span><span class="op">(</span><span class="st">"path/to/table"</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Dry run - see what would be deleted</span></span>
-<span><span class="va">dt</span><span class="op">$</span><span class="fu">vacuum</span><span class="op">(</span>retention_hours <span class="op">=</span> <span class="fl">168</span>, dry_run <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span><span class="fu"><a href="reference/vacuum.html">vacuum</a></span><span class="op">(</span><span class="va">dt</span>, retention_hours <span class="op">=</span> <span class="fl">168</span>, dry_run <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Actually delete old files</span></span>
-<span><span class="va">dt</span><span class="op">$</span><span class="fu">vacuum</span><span class="op">(</span>retention_hours <span class="op">=</span> <span class="fl">168</span>, dry_run <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu"><a href="reference/vacuum.html">vacuum</a></span><span class="op">(</span><span class="va">dt</span>, retention_hours <span class="op">=</span> <span class="fl">168</span>, dry_run <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
 </div>
 </div>
 <div class="section level2">
@@ -303,7 +317,7 @@
 <li>
 <strong>Set <code>target_file_size</code></strong> to control output file sizes for better read performance</li>
 <li>
-<strong>Use Arrow</strong> for downstream processing instead of converting to data.frame</li>
+<strong>Use Arrow or Polars</strong> for downstream processing instead of converting to data.frame</li>
 <li>
 <strong>Vacuum regularly</strong> to remove old files and reduce storage costs</li>
 </ol>
@@ -329,16 +343,13 @@
 </h2>
 <p>deltaR is built on the shoulders of giants:</p>
 <ul>
+<li><strong><a href="https://github.com/delta-io/delta-rs" class="external-link">delta-rs</a></strong></li>
+<li><strong><a href="https://delta.io/" class="external-link">Delta Lake</a></strong></li>
+<li><strong><a href="https://arrow.apache.org/" class="external-link">Apache Arrow</a></strong></li>
 <li>
-<strong><a href="https://github.com/delta-io/delta-rs" class="external-link">delta-rs</a></strong> - The Rust implementation of Delta Lake that powers this package. We are grateful to the delta-rs maintainers and contributors for their excellent work.</li>
+<strong><a href="https://extendr.github.io/" class="external-link">extendr</a></strong> - Thanks to CGMossa and the extendr contributors for making Rust + R a reality</li>
 <li>
-<strong><a href="https://delta.io/" class="external-link">Delta Lake</a></strong> - The open-source storage layer that brings reliability to data lakes.</li>
-<li>
-<strong><a href="https://arrow.apache.org/" class="external-link">Apache Arrow</a></strong> - The columnar memory format that enables high-performance data interchange.</li>
-<li>
-<strong><a href="https://extendr.github.io/" class="external-link">extendr</a></strong> - The framework that makes it possible to call Rust from R.</li>
-<li>
-<strong><a href="https://github.com/apache/arrow-nanoarrow" class="external-link">nanoarrow</a></strong> - Lightweight Arrow implementation for R.</li>
+<strong><a href="https://github.com/extendr/arrow-extendr" class="external-link">arrow-extendr</a></strong> - Thanks to @JosiahParry for the Arrow bindings that make this all work together</li>
 </ul>
 </div>
 <div class="section level2">
@@ -357,6 +368,8 @@
 <ul>
 <li>
 <a href="https://arrow.apache.org/docs/r/" class="external-link">arrow</a> - R package for Apache Arrow</li>
+<li>
+<a href="https://pola-rs.github.io/r-polars/" class="external-link">polars</a> - R interface for Polars (can read Delta tables)</li>
 <li>
 <a href="https://duckdb.org/docs/api/r" class="external-link">duckdb</a> - DuckDB R API (can read Delta tables)</li>
 <li>

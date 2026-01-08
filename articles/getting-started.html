@@ -20,7 +20,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">deltaR</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.0.9000</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -210,42 +210,55 @@ files:</p>
 <span><span class="va">dt</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/delta_table.html">delta_table</a></span><span class="op">(</span><span class="st">"path/to/sales_table"</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Get basic information</span></span>
-<span><span class="va">dt</span><span class="op">$</span><span class="fu">version</span><span class="op">(</span><span class="op">)</span></span>
-<span><span class="va">dt</span><span class="op">$</span><span class="fu">num_files</span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu"><a href="../reference/table_version.html">table_version</a></span><span class="op">(</span><span class="va">dt</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="table-metadata">Table Metadata<a class="anchor" aria-label="anchor" href="#table-metadata"></a>
 </h3>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># View the schema</span></span>
-<span><span class="va">dt</span><span class="op">$</span><span class="fu">schema</span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="fu"><a href="../reference/get_schema.html">get_schema</a></span><span class="op">(</span><span class="va">dt</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Get table metadata (name, description, etc.)</span></span>
-<span><span class="va">dt</span><span class="op">$</span><span class="fu">metadata</span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="fu"><a href="../reference/get_metadata.html">get_metadata</a></span><span class="op">(</span><span class="va">dt</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># List partition columns</span></span>
-<span><span class="va">dt</span><span class="op">$</span><span class="fu">partition_columns</span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="fu"><a href="../reference/partition_columns.html">partition_columns</a></span><span class="op">(</span><span class="va">dt</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># List all files in the table</span></span>
-<span><span class="va">dt</span><span class="op">$</span><span class="fu">get_files</span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu"><a href="../reference/get_files.html">get_files</a></span><span class="op">(</span><span class="va">dt</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="reading-data">Reading Data<a class="anchor" aria-label="anchor" href="#reading-data"></a>
 </h3>
+<p>deltaR delegates reading to other libraries like arrow, polars, or
+duckdb. Use <code><a href="../reference/get_files.html">get_files()</a></code> to get the list of Parquet files
+and pass them to your preferred library:</p>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># Read as an Arrow Table (recommended for large data)</span></span>
-<span><span class="va">arrow_table</span> <span class="op">&lt;-</span> <span class="va">dt</span><span class="op">$</span><span class="fu">to_arrow</span><span class="op">(</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="co"># Get the list of Parquet files in the Delta table</span></span>
+<span><span class="va">files</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/get_files.html">get_files</a></span><span class="op">(</span><span class="va">dt</span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># Read as a data.frame (convenient for small data)</span></span>
-<span><span class="va">df</span> <span class="op">&lt;-</span> <span class="va">dt</span><span class="op">$</span><span class="fu">to_data_frame</span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="co"># Read with arrow</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/apache/arrow/" class="external-link">arrow</a></span><span class="op">)</span></span>
+<span><span class="va">arrow_table</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://arrow.apache.org/docs/r/reference/open_dataset.html" class="external-link">open_dataset</a></span><span class="op">(</span><span class="va">files</span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># Read with a filter using dplyr</span></span>
+<span><span class="co"># Read as a data.frame (for small data)</span></span>
+<span><span class="va">df</span> <span class="op">&lt;-</span> <span class="va">arrow_table</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/compute.html" class="external-link">collect</a></span><span class="op">(</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Read with dplyr for filtering</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org" class="external-link">dplyr</a></span><span class="op">)</span></span>
 <span></span>
-<span><span class="va">high_value_orders</span> <span class="op">&lt;-</span> <span class="va">dt</span><span class="op">$</span><span class="fu">to_arrow</span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span><span class="va">high_value_orders</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://arrow.apache.org/docs/r/reference/open_dataset.html" class="external-link">open_dataset</a></span><span class="op">(</span><span class="va">files</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">price</span> <span class="op">&gt;</span> <span class="fl">200</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">order_id</span>, <span class="va">customer_id</span>, <span class="va">price</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/compute.html" class="external-link">collect</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/compute.html" class="external-link">collect</a></span><span class="op">(</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Alternative: Read with duckdb</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://r.duckdb.org/" class="external-link">duckdb</a></span><span class="op">)</span></span>
+<span><span class="va">con</span> <span class="op">&lt;-</span> <span class="fu">dbConnect</span><span class="op">(</span><span class="fu">duckdb</span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="fu">duckdb_register_arrow</span><span class="op">(</span><span class="va">con</span>, <span class="st">"sales"</span>, <span class="va">arrow_table</span><span class="op">)</span></span>
+<span><span class="va">result</span> <span class="op">&lt;-</span> <span class="fu">dbGetQuery</span><span class="op">(</span><span class="va">con</span>, <span class="st">"SELECT * FROM sales WHERE price &gt; 200"</span><span class="op">)</span></span>
+<span><span class="fu">dbDisconnect</span><span class="op">(</span><span class="va">con</span><span class="op">)</span></span></code></pre></div>
 </div>
 </div>
 <div class="section level2">
@@ -258,24 +271,25 @@ historical versions of your data.</p>
 </h3>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># View the commit history</span></span>
-<span><span class="va">history</span> <span class="op">&lt;-</span> <span class="va">dt</span><span class="op">$</span><span class="fu">history</span><span class="op">(</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">history</span><span class="op">)</span></span>
+<span><span class="va">hist</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/history.html">history</a></span><span class="op">(</span><span class="va">dt</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">hist</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Limit the number of history entries</span></span>
-<span><span class="va">recent_history</span> <span class="op">&lt;-</span> <span class="va">dt</span><span class="op">$</span><span class="fu">history</span><span class="op">(</span>limit <span class="op">=</span> <span class="fl">5</span><span class="op">)</span></span></code></pre></div>
+<span><span class="va">recent_hist</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/history.html">history</a></span><span class="op">(</span><span class="va">dt</span>, limit <span class="op">=</span> <span class="fl">5</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="loading-previous-versions">Loading Previous Versions<a class="anchor" aria-label="anchor" href="#loading-previous-versions"></a>
 </h3>
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Load a specific version</span></span>
-<span><span class="va">dt</span><span class="op">$</span><span class="fu">load_version</span><span class="op">(</span><span class="fl">2</span><span class="op">)</span></span>
+<span><span class="fu"><a href="../reference/load_version.html">load_version</a></span><span class="op">(</span><span class="va">dt</span>, version <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Read data from that version</span></span>
-<span><span class="va">old_data</span> <span class="op">&lt;-</span> <span class="va">dt</span><span class="op">$</span><span class="fu">to_data_frame</span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="va">files</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/get_files.html">get_files</a></span><span class="op">(</span><span class="va">dt</span><span class="op">)</span></span>
+<span><span class="va">old_data</span> <span class="op">&lt;-</span> <span class="fu">arrow</span><span class="fu">::</span><span class="fu"><a href="https://arrow.apache.org/docs/r/reference/open_dataset.html" class="external-link">open_dataset</a></span><span class="op">(</span><span class="va">files</span><span class="op">)</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/compute.html" class="external-link">collect</a></span><span class="op">(</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Load data as of a specific timestamp</span></span>
-<span><span class="va">dt</span><span class="op">$</span><span class="fu">load_datetime</span><span class="op">(</span><span class="st">"2024-06-15T10:30:00Z"</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu"><a href="../reference/load_datetime.html">load_datetime</a></span><span class="op">(</span><span class="va">dt</span>, datetime <span class="op">=</span> <span class="st">"2024-06-15T10:30:00Z"</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="use-cases-for-time-travel">Use Cases for Time Travel<a class="anchor" aria-label="anchor" href="#use-cases-for-time-travel"></a>
@@ -354,11 +368,11 @@ needed:</p>
 <code class="sourceCode R"><span><span class="va">dt</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/delta_table.html">delta_table</a></span><span class="op">(</span><span class="st">"path/to/sales_table"</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Dry run - see what would be deleted</span></span>
-<span><span class="va">files_to_delete</span> <span class="op">&lt;-</span> <span class="va">dt</span><span class="op">$</span><span class="fu">vacuum</span><span class="op">(</span>retention_hours <span class="op">=</span> <span class="fl">168</span>, dry_run <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span><span class="va">files_to_delete</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/vacuum.html">vacuum</a></span><span class="op">(</span><span class="va">dt</span>, retention_hours <span class="op">=</span> <span class="fl">168</span>, dry_run <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">files_to_delete</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Actually delete old files (default retention is 7 days = 168 hours)</span></span>
-<span><span class="va">dt</span><span class="op">$</span><span class="fu">vacuum</span><span class="op">(</span>retention_hours <span class="op">=</span> <span class="fl">168</span>, dry_run <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu"><a href="../reference/vacuum.html">vacuum</a></span><span class="op">(</span><span class="va">dt</span>, retention_hours <span class="op">=</span> <span class="fl">168</span>, dry_run <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
 <p><strong>Warning</strong>: Vacuuming removes the ability to time
 travel to versions older than the retention period. Choose your
 retention period carefully based on your needs.</p>
@@ -411,11 +425,11 @@ retention period carefully based on your needs.</p>
 <h3 id="use-arrow-for-large-data">2. Use Arrow for Large Data<a class="anchor" aria-label="anchor" href="#use-arrow-for-large-data"></a>
 </h3>
 <div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># Instead of loading everything into memory:</span></span>
-<span><span class="co"># df &lt;- dt$to_data_frame()</span></span>
+<code class="sourceCode R"><span><span class="co"># Instead of loading everything into memory, use Arrow for lazy evaluation:</span></span>
+<span><span class="va">files</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/get_files.html">get_files</a></span><span class="op">(</span><span class="va">dt</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Use Arrow for filtering and aggregation:</span></span>
-<span><span class="va">result</span> <span class="op">&lt;-</span> <span class="va">dt</span><span class="op">$</span><span class="fu">to_arrow</span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span><span class="va">result</span> <span class="op">&lt;-</span> <span class="fu">arrow</span><span class="fu">::</span><span class="fu"><a href="https://arrow.apache.org/docs/r/reference/open_dataset.html" class="external-link">open_dataset</a></span><span class="op">(</span><span class="va">files</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">order_date</span> <span class="op">&gt;=</span> <span class="fu"><a href="https://rdrr.io/r/base/as.Date.html" class="external-link">as.Date</a></span><span class="op">(</span><span class="st">"2024-06-01"</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/summarise.html" class="external-link">summarise</a></span><span class="op">(</span>total_sales <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">price</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/compute.html" class="external-link">collect</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>

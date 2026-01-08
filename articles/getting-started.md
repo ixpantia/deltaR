@@ -139,42 +139,58 @@ to open an existing Delta table:
 dt <- delta_table("path/to/sales_table")
 
 # Get basic information
-dt$version()
-dt$num_files()
+table_version(dt)
 ```
 
 ### Table Metadata
 
 ``` r
 # View the schema
-dt$schema()
+get_schema(dt)
 
 # Get table metadata (name, description, etc.)
-dt$metadata()
+get_metadata(dt)
 
 # List partition columns
-dt$partition_columns()
+partition_columns(dt)
 
 # List all files in the table
-dt$get_files()
+get_files(dt)
 ```
 
 ### Reading Data
 
+deltaR delegates reading to other libraries like arrow, polars, or
+duckdb. Use
+[`get_files()`](https://ixpantia.github.io/deltaR/reference/get_files.md)
+to get the list of Parquet files and pass them to your preferred
+library:
+
 ``` r
-# Read as an Arrow Table (recommended for large data)
-arrow_table <- dt$to_arrow()
+# Get the list of Parquet files in the Delta table
+files <- get_files(dt)
 
-# Read as a data.frame (convenient for small data)
-df <- dt$to_data_frame()
+# Read with arrow
+library(arrow)
+arrow_table <- open_dataset(files)
 
-# Read with a filter using dplyr
+# Read as a data.frame (for small data)
+df <- arrow_table |> collect()
+
+# Read with dplyr for filtering
 library(dplyr)
 
-high_value_orders <- dt$to_arrow() |>
+high_value_orders <- open_dataset(files) |>
   filter(price > 200) |>
   select(order_id, customer_id, price) |>
   collect()
+
+# Alternative: Read with duckdb
+library(duckdb)
+con <- dbConnect(duckdb())
+duckdb_register_arrow(con, "sales", arrow_table)
+result <- dbGetQuery(con, "SELECT * FROM sales WHERE price > 200")
+dbDisconnect(con)
 ```
 
 ## Time Travel
@@ -186,24 +202,25 @@ historical versions of your data.
 
 ``` r
 # View the commit history
-history <- dt$history()
-print(history)
+hist <- history(dt)
+print(hist)
 
 # Limit the number of history entries
-recent_history <- dt$history(limit = 5)
+recent_hist <- history(dt, limit = 5)
 ```
 
 ### Loading Previous Versions
 
 ``` r
 # Load a specific version
-dt$load_version(2)
+load_version(dt, version = 2)
 
 # Read data from that version
-old_data <- dt$to_data_frame()
+files <- get_files(dt)
+old_data <- arrow::open_dataset(files) |> collect()
 
 # Load data as of a specific timestamp
-dt$load_datetime("2024-06-15T10:30:00Z")
+load_datetime(dt, datetime = "2024-06-15T10:30:00Z")
 ```
 
 ### Use Cases for Time Travel
@@ -270,11 +287,11 @@ function removes files that are no longer needed:
 dt <- delta_table("path/to/sales_table")
 
 # Dry run - see what would be deleted
-files_to_delete <- dt$vacuum(retention_hours = 168, dry_run = TRUE)
+files_to_delete <- vacuum(dt, retention_hours = 168, dry_run = TRUE)
 print(files_to_delete)
 
 # Actually delete old files (default retention is 7 days = 168 hours)
-dt$vacuum(retention_hours = 168, dry_run = FALSE)
+vacuum(dt, retention_hours = 168, dry_run = FALSE)
 ```
 
 **Warning**: Vacuuming removes the ability to time travel to versions
@@ -325,11 +342,11 @@ is_delta_table_path("path/to/regular_folder")
 ### 2. Use Arrow for Large Data
 
 ``` r
-# Instead of loading everything into memory:
-# df <- dt$to_data_frame()
+# Instead of loading everything into memory, use Arrow for lazy evaluation:
+files <- get_files(dt)
 
 # Use Arrow for filtering and aggregation:
-result <- dt$to_arrow() |>
+result <- arrow::open_dataset(files) |>
   dplyr::filter(order_date >= as.Date("2024-06-01")) |>
   dplyr::summarise(total_sales = sum(price)) |>
   dplyr::collect()

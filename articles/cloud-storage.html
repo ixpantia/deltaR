@@ -20,7 +20,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">deltaR</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.0.9000</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -442,13 +442,15 @@ or with <code>gcloud</code> configured locally:</p>
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Read source data</span></span>
+<span><span class="co"># Read from S3 using arrow</span></span>
 <span><span class="va">source_dt</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/delta_table.html">delta_table</a></span><span class="op">(</span></span>
 <span>  <span class="st">"s3://data-lake/bronze/raw_events"</span>,</span>
 <span>  storage_options <span class="op">=</span> <span class="va">s3_options</span></span>
 <span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># Transform data</span></span>
-<span><span class="va">transformed_data</span> <span class="op">&lt;-</span> <span class="va">source_dt</span><span class="op">$</span><span class="fu">to_arrow</span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span><span class="co"># Get file paths and read with arrow, then transform</span></span>
+<span><span class="va">files</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/get_files.html">get_files</a></span><span class="op">(</span><span class="va">source_dt</span><span class="op">)</span></span>
+<span><span class="va">transformed_data</span> <span class="op">&lt;-</span> <span class="fu">arrow</span><span class="fu">::</span><span class="fu"><a href="https://arrow.apache.org/docs/r/reference/open_dataset.html" class="external-link">open_dataset</a></span><span class="op">(</span><span class="va">files</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">event_type</span> <span class="op">==</span> <span class="st">"purchase"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span></span>
 <span>    event_date <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/as.Date.html" class="external-link">as.Date</a></span><span class="op">(</span><span class="va">event_timestamp</span><span class="op">)</span>,</span>
@@ -532,12 +534,13 @@ or with <code>gcloud</code> configured locally:</p>
 <span>  azure_storage_account_key <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Sys.getenv.html" class="external-link">Sys.getenv</a></span><span class="op">(</span><span class="st">"AZURE_STORAGE_KEY"</span><span class="op">)</span></span>
 <span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># Read from S3</span></span>
+<span><span class="co"># Read from S3 using arrow</span></span>
 <span><span class="va">source_dt</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/delta_table.html">delta_table</a></span><span class="op">(</span></span>
 <span>  <span class="st">"s3://source-bucket/important_data"</span>,</span>
 <span>  storage_options <span class="op">=</span> <span class="va">s3_options</span></span>
 <span><span class="op">)</span></span>
-<span><span class="va">data</span> <span class="op">&lt;-</span> <span class="va">source_dt</span><span class="op">$</span><span class="fu">to_arrow</span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="va">files</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/get_files.html">get_files</a></span><span class="op">(</span><span class="va">source_dt</span><span class="op">)</span></span>
+<span><span class="va">data</span> <span class="op">&lt;-</span> <span class="fu">arrow</span><span class="fu">::</span><span class="fu"><a href="https://arrow.apache.org/docs/r/reference/open_dataset.html" class="external-link">open_dataset</a></span><span class="op">(</span><span class="va">files</span><span class="op">)</span> <span class="op">|&gt;</span> <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/compute.html" class="external-link">collect</a></span><span class="op">(</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Write to Azure</span></span>
 <span><span class="fu"><a href="../reference/write_deltalake.html">write_deltalake</a></span><span class="op">(</span></span>
