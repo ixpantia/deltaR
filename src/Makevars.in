@@ -11,7 +11,9 @@ all: $(SHLIB) rust_clean
 
 $(SHLIB): $(STATLIB)
 
-CARGOTMP = $(CURDIR)/.cargo
+# CARGO_HOME is set dynamically by tools/config.R
+# On Unix, this uses the current directory (no path length issues)
+CARGOTMP = @CARGO_HOME@
 VENDOR_DIR = $(CURDIR)/vendor
 
 

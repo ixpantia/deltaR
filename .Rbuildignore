@@ -1,4 +1,5 @@
 ^src/\.cargo$
+^src/\.short_build_path$
 ^src/rust/vendor$
 ^src/rust/target$
 ^src/Makevars$
