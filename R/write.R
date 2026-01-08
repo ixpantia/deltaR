@@ -259,3 +259,58 @@ create_deltalake <- function(
 
   invisible(result)
 }
+
+#' Compact a Delta table
+#'
+#' Compact files in a Delta table to reduce the number of small files and
+#' improve query performance.
+#'
+#' @param table A DeltaTable object.
+#' @param ... Additional arguments passed to methods.
+#' @param target_size Numeric. Target size in bytes for compacted files.
+#' @param max_concurrent_tasks Integer. Maximum number of concurrent tasks.
+#' @param min_commit_interval_ms Numeric. Minimum interval between commits in milliseconds.
+#' @param partition_filters Character vector. Filters to select partitions to compact (e.g., c("date=2023-01-01")).
+#'
+#' @return A list with compaction metrics.
+#'
+#' @export
+compact <- new_generic(
+  "compact",
+  "table",
+  function(
+    table,
+    ...,
+    target_size = NULL,
+    max_concurrent_tasks = NULL,
+    min_commit_interval_ms = NULL,
+    partition_filters = NULL
+  ) {
+    S7::S7_dispatch()
+  }
+)
+
+#' @export
+method(compact, DeltaTable) <- function(
+  table,
+  ...,
+  target_size = NULL,
+  max_concurrent_tasks = NULL,
+  min_commit_interval_ms = NULL,
+  partition_filters = NULL
+) {
+  result <- table@internal$compact(
+    target_size,
+    if (!is.null(max_concurrent_tasks)) {
+      as.integer(max_concurrent_tasks)
+    } else {
+      NULL
+    },
+    min_commit_interval_ms,
+    partition_filters
+  )
+  if (methods::is(result, "error")) {
+    rlang::abort(result$value)
+  }
+  result
+}

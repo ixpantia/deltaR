@@ -3,6 +3,7 @@
 S3method("$",DeltaTableInternal)
 S3method("[[",DeltaTableInternal)
 export(DeltaTable)
+export(compact)
 export(create_deltalake)
 export(delta_table)
 export(get_files)

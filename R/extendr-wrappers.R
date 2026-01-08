@@ -70,6 +70,8 @@ DeltaTableInternal$load_version <- function(version) .Call(wrap__DeltaTableInter
 
 DeltaTableInternal$load_datetime <- function(datetime_str) .Call(wrap__DeltaTableInternal__load_datetime, self, datetime_str)
 
+DeltaTableInternal$compact <- function(target_size, max_concurrent_tasks, min_commit_interval_ms, partition_filters) .Call(wrap__DeltaTableInternal__compact, self, target_size, max_concurrent_tasks, min_commit_interval_ms, partition_filters)
+
 DeltaTableInternal$vacuum <- function(retention_hours, dry_run, enforce_retention_duration) .Call(wrap__DeltaTableInternal__vacuum, self, retention_hours, dry_run, enforce_retention_duration)
 
 DeltaTableInternal$partition_columns <- function() .Call(wrap__DeltaTableInternal__partition_columns, self)

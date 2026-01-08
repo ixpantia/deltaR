@@ -6,7 +6,8 @@ use deltalake::arrow::datatypes::{
     TimeUnit as ArrowTimeUnit,
 };
 use deltalake::kernel::{DataType as KernelDataType, PrimitiveType, StructField, StructType};
-use deltalake::DeltaTable;
+use deltalake::operations::optimize::OptimizeType;
+use deltalake::{DeltaTable, PartitionFilter, PartitionValue};
 use extendr_api::prelude::*;
 use std::collections::HashMap;
 use std::sync::Arc;
@@ -313,6 +314,76 @@ impl DeltaTableInternal {
         .map_err(|e| Error::from(e.to_string()))?;
 
         Ok(())
+    }
+
+    /// Optimize the table (compact files)
+    fn compact(
+        &self,
+        target_size: Nullable<i64>,
+        max_concurrent_tasks: Nullable<i32>,
+        min_commit_interval_ms: Nullable<f64>,
+        partition_filters: Nullable<Vec<String>>,
+    ) -> Result<List> {
+        let (_, metrics) = block_on(async {
+            let mut builder = self.inner.clone().optimize();
+
+            if let Nullable::NotNull(size) = target_size {
+                builder = builder.with_target_size(size as u64);
+            }
+
+            if let Nullable::NotNull(tasks) = max_concurrent_tasks {
+                builder = builder.with_max_concurrent_tasks(tasks as usize);
+            }
+
+            if let Nullable::NotNull(ms) = min_commit_interval_ms {
+                builder =
+                    builder.with_min_commit_interval(std::time::Duration::from_millis(ms as u64));
+            }
+
+            let p_filters: Vec<PartitionFilter> = match partition_filters {
+                Nullable::NotNull(filters) => filters
+                    .into_iter()
+                    .filter_map(|f| {
+                        f.split_once('=').map(|(col, val)| PartitionFilter {
+                            key: col.trim().to_string(),
+                            value: PartitionValue::Equal(val.trim().to_string()),
+                        })
+                    })
+                    .collect(),
+                Nullable::Null => Vec::new(),
+            };
+
+            if !p_filters.is_empty() {
+                builder = builder.with_filters(&p_filters);
+            }
+
+            builder.with_type(OptimizeType::Compact).await
+        })
+        .map_err(|e| Error::from(e.to_string()))?;
+
+        Ok(list!(
+            numFilesAdded = metrics.num_files_added as i32,
+            numFilesRemoved = metrics.num_files_removed as i32,
+            filesAdded = list!(
+                min = metrics.files_added.min as f64,
+                max = metrics.files_added.max as f64,
+                avg = metrics.files_added.avg as f64,
+                totalFiles = metrics.files_added.total_files as i32,
+                totalSize = metrics.files_added.total_size as f64
+            ),
+            filesRemoved = list!(
+                min = metrics.files_removed.min as f64,
+                max = metrics.files_removed.max as f64,
+                avg = metrics.files_removed.avg as f64,
+                totalFiles = metrics.files_removed.total_files as i32,
+                totalSize = metrics.files_removed.total_size as f64
+            ),
+            partitionsOptimized = metrics.partitions_optimized as i32,
+            numBatches = metrics.num_batches as i32,
+            totalConsideredFiles = metrics.total_considered_files as i32,
+            totalFilesSkipped = metrics.total_files_skipped as i32,
+            preserveInsertionOrder = metrics.preserve_insertion_order
+        ))
     }
 
     /// Vacuum the table (remove old files)
