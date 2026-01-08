@@ -4,6 +4,8 @@
 
 - [`DeltaTable()`](https://ixpantia.github.io/deltaR/reference/DeltaTable.md)
   : DeltaTable S7 Class
+- [`compact()`](https://ixpantia.github.io/deltaR/reference/compact.md)
+  : Compact a Delta table
 - [`create_deltalake()`](https://ixpantia.github.io/deltaR/reference/create_deltalake.md)
   : Create a new empty Delta Lake table
 - [`delta_create()`](https://ixpantia.github.io/deltaR/reference/delta_create.md)
