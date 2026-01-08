@@ -19,6 +19,8 @@ delta_write(
 \arguments{
 \item{table_uri}{Path to the Delta table (will be created if it doesn't exist)}
 
+\item{stream}{Arrow data stream (nanoarrow_array_stream)}
+
 \item{mode}{Save mode: "append", "overwrite", "error", or "ignore"}
 
 \item{partition_by}{Column names to partition by (optional)}
@@ -32,8 +34,6 @@ delta_write(
 \item{schema_mode}{How to handle schema evolution: "overwrite" or "merge" (optional)}
 
 \item{target_file_size}{Target file size in bytes (optional)}
-
-\item{data}{Arrow data stream (nanoarrow_array_stream)}
 }
 \description{
 This function uses DataFusion's execution framework to write data, providing:

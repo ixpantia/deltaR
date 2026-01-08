@@ -6,6 +6,11 @@
 \usage{
 is_delta_table(path, storage_options)
 }
+\arguments{
+\item{path}{Path to check.}
+
+\item{storage_options}{Optional storage options for the backend.}
+}
 \description{
 Check if a path is a Delta Table
 }

@@ -423,6 +423,9 @@ impl DeltaTableInternal {
 }
 
 /// Open a Delta Table at the specified path
+///
+/// @param path Path to the Delta table.
+/// @param storage_options Optional storage options for the backend.
 #[extendr]
 fn delta_table_open(path: &str, storage_options: Nullable<List>) -> Result<DeltaTableInternal> {
     let url = path_to_url(path).map_err(Error::from)?;
@@ -445,6 +448,9 @@ fn delta_table_open(path: &str, storage_options: Nullable<List>) -> Result<Delta
 }
 
 /// Check if a path is a Delta Table
+///
+/// @param path Path to check.
+/// @param storage_options Optional storage options for the backend.
 #[extendr]
 fn is_delta_table(path: &str, storage_options: Nullable<List>) -> bool {
     let url = match path_to_url(path) {

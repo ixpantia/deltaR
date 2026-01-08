@@ -15,9 +15,15 @@ NULL
 register_cloud_handlers <- function() invisible(.Call(wrap__register_cloud_handlers))
 
 #' Open a Delta Table at the specified path
+#'
+#' @param path Path to the Delta table.
+#' @param storage_options Optional storage options for the backend.
 delta_table_open <- function(path, storage_options) .Call(wrap__delta_table_open, path, storage_options)
 
 #' Check if a path is a Delta Table
+#'
+#' @param path Path to check.
+#' @param storage_options Optional storage options for the backend.
 is_delta_table <- function(path, storage_options) .Call(wrap__is_delta_table, path, storage_options)
 
 #' Write data to a Delta Lake table using WriteBuilder and LogicalPlan
@@ -29,7 +35,7 @@ is_delta_table <- function(path, storage_options) .Call(wrap__is_delta_table, pa
 #' - Memory-efficient streaming writes
 #'
 #' @param table_uri Path to the Delta table (will be created if it doesn't exist)
-#' @param data Arrow data stream (nanoarrow_array_stream)
+#' @param stream Arrow data stream (nanoarrow_array_stream)
 #' @param mode Save mode: "append", "overwrite", "error", or "ignore"
 #' @param partition_by Column names to partition by (optional)
 #' @param name Table name (optional, used when creating new table)

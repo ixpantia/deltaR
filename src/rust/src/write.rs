@@ -267,7 +267,7 @@ fn to_lazy_table(
 /// - Memory-efficient streaming writes
 ///
 /// @param table_uri Path to the Delta table (will be created if it doesn't exist)
-/// @param data Arrow data stream (nanoarrow_array_stream)
+/// @param stream Arrow data stream (nanoarrow_array_stream)
 /// @param mode Save mode: "append", "overwrite", "error", or "ignore"
 /// @param partition_by Column names to partition by (optional)
 /// @param name Table name (optional, used when creating new table)

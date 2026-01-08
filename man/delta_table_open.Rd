@@ -6,6 +6,11 @@
 \usage{
 delta_table_open(path, storage_options)
 }
+\arguments{
+\item{path}{Path to the Delta table.}
+
+\item{storage_options}{Optional storage options for the backend.}
+}
 \description{
 Open a Delta Table at the specified path
 }

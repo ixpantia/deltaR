@@ -6,7 +6,7 @@ Authors@R:
 Description: Provides an R interface to Delta Lake via the delta-rs Rust library.
     Enables reading and writing Delta Lake tables with full ACID transaction support,
     time travel, and schema evolution capabilities.
-License: Apache License (>= 2) + file LICENSE
+License: Apache License (>= 2)
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.2
@@ -17,6 +17,7 @@ SystemRequirements: Cargo (Rust's package manager), rustc >= 1.88, xz
 Depends:
     R (>= 4.2)
 Imports:
+    methods,
     nanoarrow,
     rlang,
     S7

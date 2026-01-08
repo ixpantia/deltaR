@@ -10,6 +10,8 @@ history(table, ..., limit = NULL)
 \item{table}{A DeltaTable object.}
 
 \item{...}{Additional arguments passed to methods.}
+
+\item{limit}{The maximum number of commits to return.}
 }
 \value{
 A data.frame with columns: version, timestamp, operation, user_id, user_name.

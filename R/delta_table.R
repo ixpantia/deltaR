@@ -1,4 +1,5 @@
 #' @importFrom rlang abort
+#' @importFrom methods is
 NULL
 
 #' Create a DeltaTable object
@@ -197,6 +198,7 @@ method(get_schema, DeltaTable) <- function(table) {
 #' Returns the commit history of the Delta table.
 #'
 #' @param table A DeltaTable object.
+#' @param limit The maximum number of commits to return.
 #' @param ... Additional arguments passed to methods.
 #'
 #' @return A data.frame with columns: version, timestamp, operation, user_id, user_name.
