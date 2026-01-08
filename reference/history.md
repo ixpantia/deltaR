@@ -18,6 +18,10 @@ history(table, ..., limit = NULL)
 
   Additional arguments passed to methods.
 
+- limit:
+
+  The maximum number of commits to return.
+
 ## Value
 
 A data.frame with columns: version, timestamp, operation, user_id,

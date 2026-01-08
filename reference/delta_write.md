@@ -33,6 +33,10 @@ delta_write(
 
   Path to the Delta table (will be created if it doesn't exist)
 
+- stream:
+
+  Arrow data stream (nanoarrow_array_stream)
+
 - mode:
 
   Save mode: "append", "overwrite", "error", or "ignore"
@@ -60,7 +64,3 @@ delta_write(
 - target_file_size:
 
   Target file size in bytes (optional)
-
-- data:
-
-  Arrow data stream (nanoarrow_array_stream)
