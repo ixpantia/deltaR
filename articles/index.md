@@ -6,3 +6,5 @@
   Storage](https://ixpantia.github.io/deltaR/articles/cloud-storage.md):
 - [Getting Started with
   deltaR](https://ixpantia.github.io/deltaR/articles/getting-started.md):
+- [MERGE Operations in
+  deltaR](https://ixpantia.github.io/deltaR/articles/merge-operations.md):

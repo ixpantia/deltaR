@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">deltaR</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -20,6 +20,7 @@
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><a class="dropdown-item" href="../articles/cloud-storage.html">Using deltaR with Cloud Storage</a></li>
     <li><a class="dropdown-item" href="../articles/getting-started.html">Getting Started with deltaR</a></li>
+    <li><a class="dropdown-item" href="../articles/merge-operations.html">MERGE Operations in deltaR</a></li>
   </ul></li>
 <li class="active nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
       </ul><ul class="navbar-nav"><li class="nav-item"><form class="form-inline" role="search">
@@ -39,6 +40,22 @@
 
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="development version" id="deltar-development-version">deltaR (development version)<a class="anchor" aria-label="anchor" href="#deltar-development-version"></a></h2>
+<div class="section level3">
+<h3 id="new-features-development-version">New Features<a class="anchor" aria-label="anchor" href="#new-features-development-version"></a></h3>
+<ul><li>
+<strong>MERGE operations</strong>: New <code><a href="../reference/delta_merge.html">delta_merge()</a></code> function enables sophisticated data manipulation:
+<ul><li>
+<code><a href="../reference/when_matched_update.html">when_matched_update()</a></code> and <code><a href="../reference/when_matched_update_all.html">when_matched_update_all()</a></code> for updating matched rows</li>
+<li>
+<code><a href="../reference/when_matched_delete.html">when_matched_delete()</a></code> for deleting matched rows</li>
+<li>
+<code><a href="../reference/when_not_matched_insert.html">when_not_matched_insert()</a></code> and <code><a href="../reference/when_not_matched_insert_all.html">when_not_matched_insert_all()</a></code> for inserting new rows</li>
+<li>
+<code><a href="../reference/when_not_matched_by_source_update.html">when_not_matched_by_source_update()</a></code> and <code><a href="../reference/when_not_matched_by_source_delete.html">when_not_matched_by_source_delete()</a></code> for handling rows only in target</li>
+<li>Full support for conditional predicates on all clauses</li>
+<li>Returns detailed metrics (rows inserted, updated, deleted, etc.)</li>
+</ul></li>
+</ul></div>
 </div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.1.0" id="deltar-010">deltaR 0.1.0<a class="anchor" aria-label="anchor" href="#deltar-010"></a></h2>
@@ -72,7 +89,7 @@
 
 
     <footer><div class="pkgdown-footer-left">
-  <p>Developed by ixpantia.</p>
+  <p>Developed by ixpantia, SRL.</p>
 </div>
 
 <div class="pkgdown-footer-right">

@@ -22,7 +22,7 @@
 
     <a class="navbar-brand me-2" href="index.html">deltaR</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -37,6 +37,7 @@
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles">
 <li><a class="dropdown-item" href="articles/cloud-storage.html">Using deltaR with Cloud Storage</a></li>
     <li><a class="dropdown-item" href="articles/getting-started.html">Getting Started with deltaR</a></li>
+    <li><a class="dropdown-item" href="articles/merge-operations.html">MERGE Operations in deltaR</a></li>
   </ul>
 </li>
 <li class="nav-item"><a class="nav-link" href="news/index.html">Changelog</a></li>
@@ -65,6 +66,7 @@
 <ul>
 <li>📖 <strong>Read Delta tables</strong> - Get file paths to use with arrow, polars, or duckdb</li>
 <li>✍️ <strong>Write Delta tables</strong> - Create and append to Delta tables with full ACID guarantees</li>
+<li>🔀 <strong>MERGE operations</strong> - Upserts, conditional updates, and deletes in a single atomic transaction</li>
 <li>⏰ <strong>Time travel</strong> - Access historical versions of your data</li>
 <li>🔄 <strong>Schema evolution</strong> - Merge or overwrite schemas as your data evolves</li>
 <li>☁️ <strong>Cloud storage</strong> - Native support for S3, Google Cloud Storage, and Azure Blob Storage</li>
@@ -224,10 +226,59 @@
 </div>
 </div>
 <div class="section level2">
+<h2 id="merge-operations">MERGE Operations<a class="anchor" aria-label="anchor" href="#merge-operations"></a>
+</h2>
+<p>deltaR supports Delta Lake’s MERGE operation for sophisticated upserts:</p>
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Create target table</span></span>
+<span><span class="va">target</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>id <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="fl">3</span>, value <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">10</span>, <span class="fl">20</span>, <span class="fl">30</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="fu"><a href="reference/write_deltalake.html">write_deltalake</a></span><span class="op">(</span><span class="va">target</span>, <span class="st">"path/to/table"</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Source data (updates and new rows)</span></span>
+<span><span class="va">source</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>id <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2</span>, <span class="fl">4</span><span class="op">)</span>, value <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">25</span>, <span class="fl">40</span><span class="op">)</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Upsert: update existing, insert new</span></span>
+<span><span class="va">result</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/delta_merge.html">delta_merge</a></span><span class="op">(</span><span class="st">"path/to/table"</span>, <span class="va">source</span>, <span class="st">"target.id = source.id"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="reference/when_matched_update.html">when_matched_update</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>value <span class="op">=</span> <span class="st">"source.value"</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="reference/when_not_matched_insert.html">when_not_matched_insert</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>id <span class="op">=</span> <span class="st">"source.id"</span>, value <span class="op">=</span> <span class="st">"source.value"</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="reference/merge_execute.html">merge_execute</a></span><span class="op">(</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Check metrics</span></span>
+<span><span class="va">result</span><span class="op">$</span><span class="va">num_target_rows_updated</span>   <span class="co"># 1 (id=2 updated)</span></span>
+<span><span class="va">result</span><span class="op">$</span><span class="va">num_target_rows_inserted</span>  <span class="co"># 1 (id=4 inserted)</span></span></code></pre></div>
+<div class="section level3">
+<h3 id="available-clauses">Available Clauses<a class="anchor" aria-label="anchor" href="#available-clauses"></a>
+</h3>
+<ul>
+<li>
+<code><a href="reference/when_matched_update.html">when_matched_update()</a></code> - Update matched rows</li>
+<li>
+<code><a href="reference/when_matched_delete.html">when_matched_delete()</a></code> - Delete matched rows<br>
+</li>
+<li>
+<code><a href="reference/when_not_matched_insert.html">when_not_matched_insert()</a></code> - Insert unmatched source rows</li>
+<li>
+<code><a href="reference/when_not_matched_by_source_update.html">when_not_matched_by_source_update()</a></code> - Update unmatched target rows</li>
+<li>
+<code><a href="reference/when_not_matched_by_source_delete.html">when_not_matched_by_source_delete()</a></code> - Delete unmatched target rows</li>
+</ul>
+<p>All clauses support optional predicates for conditional execution:</p>
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Only update if new value is higher</span></span>
+<span><span class="fu"><a href="reference/delta_merge.html">delta_merge</a></span><span class="op">(</span><span class="st">"path/to/table"</span>, <span class="va">source</span>, <span class="st">"target.id = source.id"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="reference/when_matched_update.html">when_matched_update</a></span><span class="op">(</span></span>
+<span>    updates <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>value <span class="op">=</span> <span class="st">"source.value"</span><span class="op">)</span>,</span>
+<span>    predicate <span class="op">=</span> <span class="st">"source.value &gt; target.value"</span></span>
+<span>  <span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="reference/merge_execute.html">merge_execute</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
+<p>See <code><a href="articles/merge-operations.html">vignette("merge-operations")</a></code> for more examples.</p>
+</div>
+</div>
+<div class="section level2">
 <h2 id="schema-evolution">Schema Evolution<a class="anchor" aria-label="anchor" href="#schema-evolution"></a>
 </h2>
 <p>deltaR supports schema evolution when appending data:</p>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Original table</span></span>
 <span><span class="va">df1</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>id <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="fl">5</span>, name <span class="op">=</span> <span class="va">letters</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">5</span><span class="op">]</span><span class="op">)</span></span>
 <span><span class="fu"><a href="reference/write_deltalake.html">write_deltalake</a></span><span class="op">(</span><span class="va">df1</span>, <span class="st">"path/to/table"</span><span class="op">)</span></span>
@@ -298,7 +349,7 @@
 <h3 id="vacuum">Vacuum<a class="anchor" aria-label="anchor" href="#vacuum"></a>
 </h3>
 <p>Remove old files no longer referenced by the Delta table:</p>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">dt</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/delta_table.html">delta_table</a></span><span class="op">(</span><span class="st">"path/to/table"</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Dry run - see what would be deleted</span></span>
@@ -321,7 +372,7 @@
 <li>
 <strong>Vacuum regularly</strong> to remove old files and reduce storage costs</li>
 </ol>
-<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Control output file size (in bytes)</span></span>
 <span><span class="fu"><a href="reference/write_deltalake.html">write_deltalake</a></span><span class="op">(</span></span>
 <span>  <span class="va">large_df</span>,</span>
@@ -334,6 +385,7 @@
 </h2>
 <ul>
 <li><a href="vignettes/getting-started.Rmd">Getting Started Vignette</a></li>
+<li><a href="vignettes/merge-operations.Rmd">MERGE Operations Guide</a></li>
 <li><a href="vignettes/cloud-storage.Rmd">Cloud Storage Guide</a></li>
 <li><a href="reference/index.html">Function Reference</a></li>
 </ul>
@@ -406,7 +458,7 @@
 <div class="developers">
 <h2 data-toc-skip>Developers</h2>
 <ul class="list-unstyled">
-<li>ixpantia <br><small class="roles"> Author, maintainer </small>   </li>
+<li>ixpantia, SRL <br><small class="roles"> Author, maintainer </small>   </li>
 </ul>
 </div>
 
@@ -423,7 +475,7 @@
 
 
     <footer><div class="pkgdown-footer-left">
-  <p>Developed by ixpantia.</p>
+  <p>Developed by ixpantia, SRL.</p>
 </div>
 
 <div class="pkgdown-footer-right">

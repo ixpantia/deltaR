@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">deltaR</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -20,6 +20,7 @@
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><a class="dropdown-item" href="../articles/cloud-storage.html">Using deltaR with Cloud Storage</a></li>
     <li><a class="dropdown-item" href="../articles/getting-started.html">Getting Started with deltaR</a></li>
+    <li><a class="dropdown-item" href="../articles/merge-operations.html">MERGE Operations in deltaR</a></li>
   </ul></li>
 <li class="nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
       </ul><ul class="navbar-nav"><li class="nav-item"><form class="form-inline" role="search">
@@ -48,6 +49,13 @@
 
       <dl><dt>
 
+          <code><a href="DeltaMergeBuilder.html">DeltaMergeBuilder()</a></code>
+
+        </dt>
+        <dd>DeltaMergeBuilder S7 Class</dd>
+
+        <dt>
+
           <code><a href="DeltaTable.html">DeltaTable()</a></code>
 
         </dt>
@@ -73,6 +81,20 @@
 
         </dt>
         <dd>Create a new empty Delta Lake table</dd>
+
+        <dt>
+
+          <code><a href="delta_merge.html">delta_merge()</a></code>
+
+        </dt>
+        <dd>Start a Delta Lake MERGE operation</dd>
+
+        <dt>
+
+          <code><a href="delta_merge_execute.html">delta_merge_execute()</a></code>
+
+        </dt>
+        <dd>Execute a Delta Lake MERGE operation</dd>
 
         <dt>
 
@@ -153,6 +175,13 @@
 
         <dt>
 
+          <code><a href="merge_execute.html">merge_execute()</a></code>
+
+        </dt>
+        <dd>Execute the MERGE operation</dd>
+
+        <dt>
+
           <code><a href="partition_columns.html">partition_columns()</a></code>
 
         </dt>
@@ -181,6 +210,55 @@
 
         <dt>
 
+          <code><a href="when_matched_delete.html">when_matched_delete()</a></code>
+
+        </dt>
+        <dd>Add WHEN MATCHED THEN DELETE clause</dd>
+
+        <dt>
+
+          <code><a href="when_matched_update.html">when_matched_update()</a></code>
+
+        </dt>
+        <dd>Add WHEN MATCHED THEN UPDATE clause</dd>
+
+        <dt>
+
+          <code><a href="when_matched_update_all.html">when_matched_update_all()</a></code>
+
+        </dt>
+        <dd>Add WHEN MATCHED THEN UPDATE ALL clause</dd>
+
+        <dt>
+
+          <code><a href="when_not_matched_by_source_delete.html">when_not_matched_by_source_delete()</a></code>
+
+        </dt>
+        <dd>Add WHEN NOT MATCHED BY SOURCE THEN DELETE clause</dd>
+
+        <dt>
+
+          <code><a href="when_not_matched_by_source_update.html">when_not_matched_by_source_update()</a></code>
+
+        </dt>
+        <dd>Add WHEN NOT MATCHED BY SOURCE THEN UPDATE clause</dd>
+
+        <dt>
+
+          <code><a href="when_not_matched_insert.html">when_not_matched_insert()</a></code>
+
+        </dt>
+        <dd>Add WHEN NOT MATCHED THEN INSERT clause</dd>
+
+        <dt>
+
+          <code><a href="when_not_matched_insert_all.html">when_not_matched_insert_all()</a></code>
+
+        </dt>
+        <dd>Add WHEN NOT MATCHED THEN INSERT ALL clause</dd>
+
+        <dt>
+
           <code><a href="write_deltalake.html">write_deltalake()</a></code>
 
         </dt>
@@ -190,7 +268,7 @@
 
 
     <footer><div class="pkgdown-footer-left">
-  <p>Developed by ixpantia.</p>
+  <p>Developed by ixpantia, SRL.</p>
 </div>
 
 <div class="pkgdown-footer-right">

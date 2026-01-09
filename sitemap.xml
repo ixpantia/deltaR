@@ -4,13 +4,17 @@
 <url><loc>https://ixpantia.github.io/deltaR/articles/cloud-storage.html</loc></url>
 <url><loc>https://ixpantia.github.io/deltaR/articles/getting-started.html</loc></url>
 <url><loc>https://ixpantia.github.io/deltaR/articles/index.html</loc></url>
+<url><loc>https://ixpantia.github.io/deltaR/articles/merge-operations.html</loc></url>
 <url><loc>https://ixpantia.github.io/deltaR/authors.html</loc></url>
 <url><loc>https://ixpantia.github.io/deltaR/index.html</loc></url>
 <url><loc>https://ixpantia.github.io/deltaR/news/index.html</loc></url>
+<url><loc>https://ixpantia.github.io/deltaR/reference/DeltaMergeBuilder.html</loc></url>
 <url><loc>https://ixpantia.github.io/deltaR/reference/DeltaTable.html</loc></url>
 <url><loc>https://ixpantia.github.io/deltaR/reference/compact.html</loc></url>
 <url><loc>https://ixpantia.github.io/deltaR/reference/create_deltalake.html</loc></url>
 <url><loc>https://ixpantia.github.io/deltaR/reference/delta_create.html</loc></url>
+<url><loc>https://ixpantia.github.io/deltaR/reference/delta_merge.html</loc></url>
+<url><loc>https://ixpantia.github.io/deltaR/reference/delta_merge_execute.html</loc></url>
 <url><loc>https://ixpantia.github.io/deltaR/reference/delta_table.html</loc></url>
 <url><loc>https://ixpantia.github.io/deltaR/reference/delta_table_open.html</loc></url>
 <url><loc>https://ixpantia.github.io/deltaR/reference/delta_write.html</loc></url>
@@ -23,10 +27,18 @@
 <url><loc>https://ixpantia.github.io/deltaR/reference/is_delta_table_path.html</loc></url>
 <url><loc>https://ixpantia.github.io/deltaR/reference/load_datetime.html</loc></url>
 <url><loc>https://ixpantia.github.io/deltaR/reference/load_version.html</loc></url>
+<url><loc>https://ixpantia.github.io/deltaR/reference/merge_execute.html</loc></url>
 <url><loc>https://ixpantia.github.io/deltaR/reference/partition_columns.html</loc></url>
 <url><loc>https://ixpantia.github.io/deltaR/reference/register_cloud_handlers.html</loc></url>
 <url><loc>https://ixpantia.github.io/deltaR/reference/table_version.html</loc></url>
 <url><loc>https://ixpantia.github.io/deltaR/reference/vacuum.html</loc></url>
+<url><loc>https://ixpantia.github.io/deltaR/reference/when_matched_delete.html</loc></url>
+<url><loc>https://ixpantia.github.io/deltaR/reference/when_matched_update.html</loc></url>
+<url><loc>https://ixpantia.github.io/deltaR/reference/when_matched_update_all.html</loc></url>
+<url><loc>https://ixpantia.github.io/deltaR/reference/when_not_matched_by_source_delete.html</loc></url>
+<url><loc>https://ixpantia.github.io/deltaR/reference/when_not_matched_by_source_update.html</loc></url>
+<url><loc>https://ixpantia.github.io/deltaR/reference/when_not_matched_insert.html</loc></url>
+<url><loc>https://ixpantia.github.io/deltaR/reference/when_not_matched_insert_all.html</loc></url>
 <url><loc>https://ixpantia.github.io/deltaR/reference/write_deltalake.html</loc></url>
 </urlset>
 

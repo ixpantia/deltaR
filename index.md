@@ -13,6 +13,8 @@ overhead.
   or duckdb
 - ✍️ **Write Delta tables** - Create and append to Delta tables with
   full ACID guarantees
+- 🔀 **MERGE operations** - Upserts, conditional updates, and deletes in
+  a single atomic transaction
 - ⏰ **Time travel** - Access historical versions of your data
 - 🔄 **Schema evolution** - Merge or overwrite schemas as your data
   evolves
@@ -175,6 +177,58 @@ write_deltalake(
 )
 ```
 
+## MERGE Operations
+
+deltaR supports Delta Lake’s MERGE operation for sophisticated upserts:
+
+``` r
+# Create target table
+target <- data.frame(id = 1:3, value = c(10, 20, 30))
+write_deltalake(target, "path/to/table")
+
+# Source data (updates and new rows)
+source <- data.frame(id = c(2, 4), value = c(25, 40))
+
+# Upsert: update existing, insert new
+result <- delta_merge("path/to/table", source, "target.id = source.id") |>
+  when_matched_update(c(value = "source.value")) |>
+  when_not_matched_insert(c(id = "source.id", value = "source.value")) |>
+  merge_execute()
+
+# Check metrics
+result$num_target_rows_updated   # 1 (id=2 updated)
+result$num_target_rows_inserted  # 1 (id=4 inserted)
+```
+
+### Available Clauses
+
+- [`when_matched_update()`](https://ixpantia.github.io/deltaR/reference/when_matched_update.md) -
+  Update matched rows
+- [`when_matched_delete()`](https://ixpantia.github.io/deltaR/reference/when_matched_delete.md) -
+  Delete matched rows  
+- [`when_not_matched_insert()`](https://ixpantia.github.io/deltaR/reference/when_not_matched_insert.md) -
+  Insert unmatched source rows
+- [`when_not_matched_by_source_update()`](https://ixpantia.github.io/deltaR/reference/when_not_matched_by_source_update.md) -
+  Update unmatched target rows
+- [`when_not_matched_by_source_delete()`](https://ixpantia.github.io/deltaR/reference/when_not_matched_by_source_delete.md) -
+  Delete unmatched target rows
+
+All clauses support optional predicates for conditional execution:
+
+``` r
+# Only update if new value is higher
+delta_merge("path/to/table", source, "target.id = source.id") |>
+  when_matched_update(
+    updates = c(value = "source.value"),
+    predicate = "source.value > target.value"
+  ) |>
+  merge_execute()
+```
+
+See
+[`vignette("merge-operations")`](https://ixpantia.github.io/deltaR/articles/merge-operations.md)
+for more examples.
+
 ## Schema Evolution
 
 deltaR supports schema evolution when appending data:
@@ -247,6 +301,8 @@ write_deltalake(
 
 - [Getting Started
   Vignette](https://ixpantia.github.io/deltaR/vignettes/getting-started.Rmd)
+- [MERGE Operations
+  Guide](https://ixpantia.github.io/deltaR/vignettes/merge-operations.Rmd)
 - [Cloud Storage
   Guide](https://ixpantia.github.io/deltaR/vignettes/cloud-storage.Rmd)
 - [Function

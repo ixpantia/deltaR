@@ -4,7 +4,8 @@ pkgdown_sha: ~
 articles:
   cloud-storage: cloud-storage.html
   getting-started: getting-started.html
-last_built: 2026-01-08T07:31Z
+  merge-operations: merge-operations.html
+last_built: 2026-01-09T22:56Z
 urls:
   reference: https://ixpantia.github.io/deltaR/reference
   article: https://ixpantia.github.io/deltaR/articles

@@ -2,6 +2,28 @@
 
 ## deltaR (development version)
 
+### New Features
+
+- **MERGE operations**: New
+  [`delta_merge()`](https://ixpantia.github.io/deltaR/reference/delta_merge.md)
+  function enables sophisticated data manipulation:
+  - [`when_matched_update()`](https://ixpantia.github.io/deltaR/reference/when_matched_update.md)
+    and
+    [`when_matched_update_all()`](https://ixpantia.github.io/deltaR/reference/when_matched_update_all.md)
+    for updating matched rows
+  - [`when_matched_delete()`](https://ixpantia.github.io/deltaR/reference/when_matched_delete.md)
+    for deleting matched rows
+  - [`when_not_matched_insert()`](https://ixpantia.github.io/deltaR/reference/when_not_matched_insert.md)
+    and
+    [`when_not_matched_insert_all()`](https://ixpantia.github.io/deltaR/reference/when_not_matched_insert_all.md)
+    for inserting new rows
+  - [`when_not_matched_by_source_update()`](https://ixpantia.github.io/deltaR/reference/when_not_matched_by_source_update.md)
+    and
+    [`when_not_matched_by_source_delete()`](https://ixpantia.github.io/deltaR/reference/when_not_matched_by_source_delete.md)
+    for handling rows only in target
+  - Full support for conditional predicates on all clauses
+  - Returns detailed metrics (rows inserted, updated, deleted, etc.)
+
 ## deltaR 0.1.0
 
 ### New Features

@@ -13,6 +13,8 @@ overhead.
   or duckdb
 - ✍️ **Write Delta tables** - Create and append to Delta tables with
   full ACID guarantees
+- 🔀 **MERGE operations** - Upserts, conditional updates, and deletes in
+  a single atomic transaction
 - ⏰ **Time travel** - Access historical versions of your data
 - 🔄 **Schema evolution** - Merge or overwrite schemas as your data
   evolves
@@ -175,6 +177,58 @@ write_deltalake(
 )
 ```
 
+## MERGE Operations
+
+deltaR supports Delta Lake’s MERGE operation for sophisticated upserts:
+
+``` r
+# Create target table
+target <- data.frame(id = 1:3, value = c(10, 20, 30))
+write_deltalake(target, "path/to/table")
+
+# Source data (updates and new rows)
+source <- data.frame(id = c(2, 4), value = c(25, 40))
+
+# Upsert: update existing, insert new
+result <- delta_merge("path/to/table", source, "target.id = source.id") |>
+  when_matched_update(c(value = "source.value")) |>
+  when_not_matched_insert(c(id = "source.id", value = "source.value")) |>
+  merge_execute()
+
+# Check metrics
+result$num_target_rows_updated   # 1 (id=2 updated)
+result$num_target_rows_inserted  # 1 (id=4 inserted)
+```
+
+### Available Clauses
+
+- [`when_matched_update()`](https://ixpantia.github.io/deltaR/reference/when_matched_update.md) -
+  Update matched rows
+- [`when_matched_delete()`](https://ixpantia.github.io/deltaR/reference/when_matched_delete.md) -
+  Delete matched rows  
+- [`when_not_matched_insert()`](https://ixpantia.github.io/deltaR/reference/when_not_matched_insert.md) -
+  Insert unmatched source rows
+- [`when_not_matched_by_source_update()`](https://ixpantia.github.io/deltaR/reference/when_not_matched_by_source_update.md) -
+  Update unmatched target rows
+- [`when_not_matched_by_source_delete()`](https://ixpantia.github.io/deltaR/reference/when_not_matched_by_source_delete.md) -
+  Delete unmatched target rows
+
+All clauses support optional predicates for conditional execution:
+
+``` r
+# Only update if new value is higher
+delta_merge("path/to/table", source, "target.id = source.id") |>
+  when_matched_update(
+    updates = c(value = "source.value"),
+    predicate = "source.value > target.value"
+  ) |>
+  merge_execute()
+```
+
+See
+[`vignette("merge-operations")`](https://ixpantia.github.io/deltaR/articles/merge-operations.md)
+for more examples.
+
 ## Schema Evolution
 
 deltaR supports schema evolution when appending data:
@@ -247,6 +301,8 @@ write_deltalake(
 
 - [Getting Started
   Vignette](https://ixpantia.github.io/deltaR/vignettes/getting-started.Rmd)
+- [MERGE Operations
+  Guide](https://ixpantia.github.io/deltaR/vignettes/merge-operations.Rmd)
 - [Cloud Storage
   Guide](https://ixpantia.github.io/deltaR/vignettes/cloud-storage.Rmd)
 - [Function
@@ -294,6 +350,8 @@ Made with ❤️ by [ixpantia](https://www.ixpantia.com/)
 
 ## All functions
 
+- [`DeltaMergeBuilder()`](https://ixpantia.github.io/deltaR/reference/DeltaMergeBuilder.md)
+  : DeltaMergeBuilder S7 Class
 - [`DeltaTable()`](https://ixpantia.github.io/deltaR/reference/DeltaTable.md)
   : DeltaTable S7 Class
 - [`compact()`](https://ixpantia.github.io/deltaR/reference/compact.md)
@@ -302,6 +360,10 @@ Made with ❤️ by [ixpantia](https://www.ixpantia.com/)
   : Create a new empty Delta Lake table
 - [`delta_create()`](https://ixpantia.github.io/deltaR/reference/delta_create.md)
   : Create a new empty Delta Lake table
+- [`delta_merge()`](https://ixpantia.github.io/deltaR/reference/delta_merge.md)
+  : Start a Delta Lake MERGE operation
+- [`delta_merge_execute()`](https://ixpantia.github.io/deltaR/reference/delta_merge_execute.md)
+  : Execute a Delta Lake MERGE operation
 - [`delta_table()`](https://ixpantia.github.io/deltaR/reference/delta_table.md)
   : Create a DeltaTable object
 - [`delta_table_open()`](https://ixpantia.github.io/deltaR/reference/delta_table_open.md)
@@ -324,6 +386,8 @@ Made with ❤️ by [ixpantia](https://www.ixpantia.com/)
   : Load table at a specific datetime
 - [`load_version()`](https://ixpantia.github.io/deltaR/reference/load_version.md)
   : Load a specific version of the table
+- [`merge_execute()`](https://ixpantia.github.io/deltaR/reference/merge_execute.md)
+  : Execute the MERGE operation
 - [`partition_columns()`](https://ixpantia.github.io/deltaR/reference/partition_columns.md)
   : Get partition columns
 - [`register_cloud_handlers()`](https://ixpantia.github.io/deltaR/reference/register_cloud_handlers.md)
@@ -333,6 +397,20 @@ Made with ❤️ by [ixpantia](https://www.ixpantia.com/)
   : Get the current version of a Delta table
 - [`vacuum()`](https://ixpantia.github.io/deltaR/reference/vacuum.md) :
   Vacuum a Delta table
+- [`when_matched_delete()`](https://ixpantia.github.io/deltaR/reference/when_matched_delete.md)
+  : Add WHEN MATCHED THEN DELETE clause
+- [`when_matched_update()`](https://ixpantia.github.io/deltaR/reference/when_matched_update.md)
+  : Add WHEN MATCHED THEN UPDATE clause
+- [`when_matched_update_all()`](https://ixpantia.github.io/deltaR/reference/when_matched_update_all.md)
+  : Add WHEN MATCHED THEN UPDATE ALL clause
+- [`when_not_matched_by_source_delete()`](https://ixpantia.github.io/deltaR/reference/when_not_matched_by_source_delete.md)
+  : Add WHEN NOT MATCHED BY SOURCE THEN DELETE clause
+- [`when_not_matched_by_source_update()`](https://ixpantia.github.io/deltaR/reference/when_not_matched_by_source_update.md)
+  : Add WHEN NOT MATCHED BY SOURCE THEN UPDATE clause
+- [`when_not_matched_insert()`](https://ixpantia.github.io/deltaR/reference/when_not_matched_insert.md)
+  : Add WHEN NOT MATCHED THEN INSERT clause
+- [`when_not_matched_insert_all()`](https://ixpantia.github.io/deltaR/reference/when_not_matched_insert_all.md)
+  : Add WHEN NOT MATCHED THEN INSERT ALL clause
 - [`write_deltalake()`](https://ixpantia.github.io/deltaR/reference/write_deltalake.md)
   : Write data to a Delta Lake table
 
@@ -344,3 +422,5 @@ Made with ❤️ by [ixpantia](https://www.ixpantia.com/)
   Storage](https://ixpantia.github.io/deltaR/articles/cloud-storage.md):
 - [Getting Started with
   deltaR](https://ixpantia.github.io/deltaR/articles/getting-started.md):
+- [MERGE Operations in
+  deltaR](https://ixpantia.github.io/deltaR/articles/merge-operations.md):
