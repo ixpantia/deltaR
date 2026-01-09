@@ -16,3 +16,6 @@
 ^justfile$
 ^doc$
 ^Meta$
+^\.\.Rcheck$
+^.*\.Rcheck$
+^MERGE_IMPLEMENTATION_PLAN\.md$
