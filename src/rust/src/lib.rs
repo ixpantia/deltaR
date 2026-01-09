@@ -1,3 +1,4 @@
+mod merge;
 mod write;
 
 use arrow_extendr::to::IntoArrowRobj;
@@ -478,6 +479,7 @@ fn is_delta_table(path: &str, storage_options: Nullable<List>) -> bool {
 // This ensures exported functions are registered with R.
 extendr_module! {
     mod deltaR;
+    use merge;
     use write;
     impl DeltaTableInternal;
     fn register_cloud_handlers;

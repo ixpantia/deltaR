@@ -4,3 +4,7 @@ src/Makevars.win
 docs
 /doc/
 /Meta/
+.DS_Store
+
+*.Rcheck/
+deltaR_*.tar.gz

@@ -1,8 +1,10 @@
 Package: deltaR
 Title: R Interface to Delta Lake
-Version: 0.1.0
+Version: 0.2.0
 Authors@R:
-    person("ixpantia", email = "hola@ixpantia.com", role = c("aut", "cre"))
+    person("ixpantia, SRL", email = "hola@ixpantia.com", role = c("aut", "cre"))
+Author: ixpantia, SRL
+Maintainer: ixpantia, SRL <hola@ixpantia.com>
 Description: Provides an R interface to Delta Lake via the delta-rs Rust library.
     Enables reading and writing Delta Lake tables with full ACID transaction support,
     time travel, and schema evolution capabilities.
@@ -30,3 +32,9 @@ Suggests:
     testthat (>= 3.0.0)
 VignetteBuilder: knitr
 Config/testthat/edition: 3
+Collate:
+    '00_classes.R'
+    'delta_table.R'
+    'extendr-wrappers.R'
+    'merge.R'
+    'write.R'

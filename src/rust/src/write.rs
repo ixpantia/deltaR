@@ -226,7 +226,7 @@ impl Iterator for LazyCastReader {
 
 /// Returns a boxed reader that lazily casts each batch to the provided schema.
 /// If the schemas are already equal, returns the input reader unchanged.
-fn maybe_lazy_cast_reader(
+pub(crate) fn maybe_lazy_cast_reader(
     input: Box<dyn RecordBatchReader + Send + 'static>,
     target_schema: SchemaRef,
 ) -> Box<dyn RecordBatchReader + Send + 'static> {
@@ -241,7 +241,7 @@ fn maybe_lazy_cast_reader(
 }
 
 /// Convert a RecordBatchReader into a LazyTableProvider for use with DataFusion
-fn to_lazy_table(
+pub(crate) fn to_lazy_table(
     source: Box<dyn RecordBatchReader + Send + 'static>,
 ) -> std::result::Result<Arc<dyn TableProvider>, String> {
     let schema = source.schema();

@@ -26,6 +26,24 @@ delta_table_open <- function(path, storage_options) .Call(wrap__delta_table_open
 #' @param storage_options Optional storage options for the backend.
 is_delta_table <- function(path, storage_options) .Call(wrap__is_delta_table, path, storage_options)
 
+#' Execute a Delta Lake MERGE operation
+#'
+#' This function receives all merge configuration from R and executes
+#' the merge in a single call, avoiding complex state management.
+#'
+#' @param table_uri Path to the Delta table
+#' @param source_stream Arrow data stream for source data
+#' @param predicate Main merge predicate (e.g., "target.id = source.id")
+#' @param source_alias Alias for source table in expressions
+#' @param target_alias Alias for target table in expressions
+#' @param matched_update_clauses List of update clauses for matched rows
+#' @param matched_delete_clauses List of delete clauses for matched rows
+#' @param not_matched_insert_clauses List of insert clauses for unmatched source rows
+#' @param not_matched_by_source_update_clauses List of update clauses for unmatched target rows
+#' @param not_matched_by_source_delete_clauses List of delete clauses for unmatched target rows
+#' @param storage_options Storage backend options (optional)
+delta_merge_execute <- function(table_uri, source_stream, predicate, source_alias, target_alias, matched_update_clauses, matched_delete_clauses, not_matched_insert_clauses, not_matched_by_source_update_clauses, not_matched_by_source_delete_clauses, storage_options) .Call(wrap__delta_merge_execute, table_uri, source_stream, predicate, source_alias, target_alias, matched_update_clauses, matched_delete_clauses, not_matched_insert_clauses, not_matched_by_source_update_clauses, not_matched_by_source_delete_clauses, storage_options)
+
 #' Write data to a Delta Lake table using WriteBuilder and LogicalPlan
 #'
 #' This function uses DataFusion's execution framework to write data, providing:

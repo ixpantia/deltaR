@@ -1,4 +1,15 @@
 # deltaR (development version)
+
+## New Features
+
+* **MERGE operations**: New `delta_merge()` function enables sophisticated data manipulation:
+  - `when_matched_update()` and `when_matched_update_all()` for updating matched rows
+  - `when_matched_delete()` for deleting matched rows
+  - `when_not_matched_insert()` and `when_not_matched_insert_all()` for inserting new rows
+  - `when_not_matched_by_source_update()` and `when_not_matched_by_source_delete()` for handling rows only in target
+  - Full support for conditional predicates on all clauses
+  - Returns detailed metrics (rows inserted, updated, deleted, etc.)
+
 # deltaR 0.1.0
 
 ## New Features
