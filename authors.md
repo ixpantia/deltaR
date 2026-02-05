@@ -7,7 +7,7 @@
 ## Citation
 
 Source:
-[`DESCRIPTION`](https://github.com/ixpantia/deltaR/blob/main/DESCRIPTION)
+[`DESCRIPTION`](https://github.com/ixpantia/deltaR/blob/v0.2.0-rc.1/DESCRIPTION)
 
 ixpantia, SRL (2026). *deltaR: R Interface to Delta Lake*. R package
 version 0.2.0, <https://github.com/ixpantia/deltaR>.
