@@ -7,6 +7,6 @@
 # * https://testthat.r-lib.org/articles/special-files.html
 
 library(testthat)
-library(deltaR)
+library(deltalakeR)
 
-test_check("deltaR")
+test_check("deltalakeR")

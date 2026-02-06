@@ -1,8 +1,8 @@
 ---
-title: "Using deltaR with Cloud Storage"
+title: "Using deltalakeR with Cloud Storage"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Using deltaR with Cloud Storage}
+  %\VignetteIndexEntry{Using deltalakeR with Cloud Storage}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -17,21 +17,23 @@ knitr::opts_chunk$set(
 
 ## Introduction
 
-deltaR provides native support for reading and writing Delta tables to cloud storage services, including:
- - **Amazon S3**
+deltalakeR provides native support for reading and writing Delta tables to cloud storage services, including:
+ - **Amazon S3** (Linux/macOS only)
 - **Google Cloud Storage (GCS)**
 - **Azure Blob Storage / Azure Data Lake Storage (ADLS)**
 
-This guide covers how to configure and use each cloud storage provider with deltaR.
+This guide covers how to configure and use each cloud storage provider with deltalakeR.
+
+> **Platform Note:** S3 support is currently only available on Linux and macOS due to compilation issues on Windows. Windows users should use Google Cloud Storage or Azure Blob Storage for cloud-based Delta tables.
 
 ## General Concepts
 
 ### Storage Options
 
-All cloud storage operations in deltaR use the `storage_options` parameter to pass authentication credentials and configuration. This is a named list where keys and values depend on the cloud provider.
+All cloud storage operations in deltalakeR use the `storage_options` parameter to pass authentication credentials and configuration. This is a named list where keys and values depend on the cloud provider.
 
 ```{r setup}
-library(deltaR)
+library(deltalakeR)
 ```
 
 ### URI Formats
@@ -47,9 +49,11 @@ Each cloud provider uses a specific URI format:
 
 ## Amazon S3
 
+> **Platform Availability:** Linux and macOS only. S3 support is not available on Windows due to compilation issues with the underlying dependencies.
+
 ### Authentication Options
 
-deltaR supports multiple authentication methods for S3:
+deltalakeR supports multiple authentication methods for S3:
 
 #### 1. Access Keys
 
@@ -118,7 +122,7 @@ storage_options <- list(
 
 ### S3-Compatible Storage
 
-deltaR works with S3-compatible storage services like MinIO, LocalStack, or Ceph:
+deltalakeR works with S3-compatible storage services like MinIO, LocalStack, or Ceph:
 
 ```{r s3-compatible}
 # MinIO example
@@ -274,7 +278,7 @@ dt <- delta_table(
 ### Example 1: ETL Pipeline with S3
 
 ```{r example-s3-etl}
-library(deltaR)
+library(deltalakeR)
 library(dplyr)
 
 # Configure S3 storage
@@ -315,7 +319,7 @@ write_deltalake(
 ### Example 2: Data Lakehouse with GCS
 
 ```{r example-gcs-lakehouse}
-library(deltaR)
+library(deltalakeR)
 
 # Configure GCS storage
 gcs_options <- list(
@@ -362,7 +366,7 @@ write_deltalake(
 ### Example 3: Multi-Cloud Data Replication
 
 ```{r example-multi-cloud}
-library(deltaR)
+library(deltalakeR)
 
 # Source: AWS S3
 s3_options <- list(
@@ -480,7 +484,7 @@ Enable encryption at rest and in transit:
 
 ```{r debugging}
 # Enable verbose logging (if available)
-options(deltaR.verbose = TRUE)
+options(deltalakeR.verbose = TRUE)
 
 # Test credentials with a simple operation
 tryCatch({
@@ -493,4 +497,4 @@ tryCatch({
 
 ## Acknowledgments
 
-deltaR's cloud storage support is powered by the [object_store](https://github.com/apache/arrow-rs/tree/master/object_store) crate from the Apache Arrow project and the [delta-rs](https://github.com/delta-io/delta-rs) library. We thank the maintainers and contributors of these projects for their excellent work.
+deltalakeR's cloud storage support is powered by the [object_store](https://github.com/apache/arrow-rs-object-store) crate from the Apache Arrow project and the [delta-rs](https://github.com/delta-io/delta-rs) library. We thank the maintainers and contributors of these projects for their excellent work.

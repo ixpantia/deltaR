@@ -19,3 +19,4 @@
 ^\.\.Rcheck$
 ^.*\.Rcheck$
 ^MERGE_IMPLEMENTATION_PLAN\.md$
+^cran-comments\.md$

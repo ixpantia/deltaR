@@ -1,8 +1,8 @@
 ---
-title: "MERGE Operations in deltaR"
+title: "MERGE Operations in deltalakeR"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{MERGE Operations in deltaR}
+  %\VignetteIndexEntry{MERGE Operations in deltalakeR}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -23,7 +23,7 @@ Delta Lake's MERGE operation allows you to perform sophisticated upserts, combin
 - **Slowly Changing Dimensions (SCD)**: Managing historical data in data warehouses
 - **Data synchronization**: Keeping tables in sync with source systems
 
-This vignette demonstrates how to use the `delta_merge()` function and its associated clause builders in deltaR.
+This vignette demonstrates how to use the `delta_merge()` function and its associated clause builders in deltalakeR.
 
 ## Basic Usage
 
@@ -35,7 +35,7 @@ The merge operation follows a builder pattern:
 3. Execute with `merge_execute()`
 
 ```{r setup}
-library(deltaR)
+library(deltalakeR)
 ```
 
 ### Simple Update (WHEN MATCHED)

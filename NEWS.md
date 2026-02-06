@@ -1,4 +1,4 @@
-# deltaR (development version)
+# deltalakeR (development version)
 
 ## New Features
 
@@ -10,11 +10,11 @@
   - Full support for conditional predicates on all clauses
   - Returns detailed metrics (rows inserted, updated, deleted, etc.)
 
-# deltaR 0.1.0
+# deltalakeR 0.1.0
 
 ## New Features
 
-* Initial release of deltaR, an R interface to Delta Lake.
+* Initial release of deltalakeR, an R interface to Delta Lake.
 * **Reading Delta tables**: Open and query Delta tables with `delta_table()`.
 * **Writing Delta tables**: Create and modify Delta tables with `write_deltalake()`.
 * **Time travel**: Access historical versions with `load_version()` and `load_datetime()`.

@@ -1,5 +1,5 @@
 [package]
-name = 'deltaR'
+name = 'deltalakeR'
 publish = false
 version = '0.1.0'
 edition = '2021'
@@ -7,18 +7,25 @@ edition = '2021'
 
 [lib]
 crate-type = [ 'staticlib' ]
-name = 'deltaR'
+name = 'deltalakeR'
 
 [dependencies]
 arrow = { version = "57.1", default-features = false, features = ["ffi"] }
 arrow_extendr = "57.0.0"
 async-trait = "0.1"
 chrono = "0.4"
-deltalake = { version = "0.30.0", features = ["datafusion", "gcs", "s3", "azure"] }
 extendr-api = { version = "0.8.1", features = ["result_condition"] }
 parking_lot = "0.12"
 tokio = { version = "1.49.0", features = ["rt"] }
 url = "2.5"
+
+# Unix (Linux/macOS): Use rustls and enable S3 support
+[target.'cfg(unix)'.dependencies]
+deltalake = { version = "0.30.2", default-features = false, features = ["datafusion", "gcs", "azure", "s3", "rustls"] }
+
+# Windows: Use native-tls, disable S3 due to compilation issues
+[target.'cfg(windows)'.dependencies]
+deltalake = { version = "0.30.2", default-features = false, features = ["datafusion", "gcs", "azure", "rustls"] }
 
 [profile.release]
 lto = true

@@ -1,4 +1,4 @@
-# deltaR Development Commands
+# deltalakeR Development Commands
 # Run `just --list` to see all available commands
 
 # Default recipe: list all commands

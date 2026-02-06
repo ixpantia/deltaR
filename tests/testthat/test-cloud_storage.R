@@ -2,20 +2,20 @@
 
 test_that("is_local_path identifies cloud URIs correctly", {
   # Internal function check
-  expect_false(deltaR:::is_local_path("gs://bucket/path"))
-  expect_false(deltaR:::is_local_path("s3://bucket/path"))
-  expect_false(deltaR:::is_local_path("az://bucket/path"))
-  expect_false(deltaR:::is_local_path("abfs://bucket/path"))
-  expect_true(deltaR:::is_local_path("/local/path"))
-  expect_true(deltaR:::is_local_path("C:/local/path"))
-  expect_true(deltaR:::is_local_path("./relative/path"))
+  expect_false(deltalakeR:::is_local_path("gs://bucket/path"))
+  expect_false(deltalakeR:::is_local_path("s3://bucket/path"))
+  expect_false(deltalakeR:::is_local_path("az://bucket/path"))
+  expect_false(deltalakeR:::is_local_path("abfs://bucket/path"))
+  expect_true(deltalakeR:::is_local_path("/local/path"))
+  expect_true(deltalakeR:::is_local_path("C:/local/path"))
+  expect_true(deltalakeR:::is_local_path("./relative/path"))
 })
 
 test_that("is_delta_table_path handles cloud URIs without crashing", {
   # This should return FALSE but not crash, as it will fail to connect/find the table
   # but the URL parsing and storage options plumbing should work.
   expect_false(is_delta_table_path(
-    "gs://nonexistent-bucket-deltaR-test/table",
+    "gs://nonexistent-bucket-deltalakeR-test/table",
     storage_options = list(google_service_account_path = "nonexistent.json")
   ))
 })
@@ -64,7 +64,7 @@ test_that("GCS write and read works (Integration)", {
 
   # Test opening the table
   dt <- delta_table(uri, storage_options = opts)
-  expect_s3_class(dt, "deltaR::DeltaTable")
+  expect_s3_class(dt, "deltalakeR::DeltaTable")
   expect_equal(table_version(dt), res$version)
 
   # Verify files are in GCS

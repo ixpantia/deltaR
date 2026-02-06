@@ -1,8 +1,8 @@
 ---
-title: "Getting Started with deltaR"
+title: "Getting Started with deltalakeR"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Getting Started with deltaR}
+  %\VignetteIndexEntry{Getting Started with deltalakeR}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -16,7 +16,7 @@ knitr::opts_chunk$set(
 ```
 
 ## Introduction
-deltaR provides an R interface to [Delta Lake](https://delta.io/), the open-source storage layer that brings ACID transactions to data lakes. Built on the high-performance [delta-rs](https://github.com/delta-io/delta-rs) Rust library, deltaR enables you to read and write Delta tables directly from R with minimal overhead.
+deltalakeR provides an R interface to [Delta Lake](https://delta.io/), the open-source storage layer that brings ACID transactions to data lakes. Built on the high-performance [delta-rs](https://github.com/delta-io/delta-rs) Rust library, deltalakeR enables you to read and write Delta tables directly from R with minimal overhead.
 
 ### What is Delta Lake?
 
@@ -32,7 +32,7 @@ Delta Lake is an open-source storage framework that enables building a lakehouse
 
 ### Prerequisites
 
-deltaR requires the Rust toolchain to compile from source:
+deltalakeR requires the Rust toolchain to compile from source:
 
 ```{r install-rust, eval=FALSE}
 # On macOS/Linux, install Rust via rustup:
@@ -41,18 +41,18 @@ deltaR requires the Rust toolchain to compile from source:
 # On Windows, download and run rustup-init.exe from https://rustup.rs/
 ```
 
-### Install deltaR
+### Install deltalakeR
 
-```{r install-deltar}
+```{r install-deltalakeR}
 # Install from GitHub
-remotes::install_github("ixpantia/deltaR")
+remotes::install_github("ixpantia/deltalakeR")
 ```
 
 ## Writing Data to Delta Tables
 
 The primary function for writing data is `write_deltalake()`. It accepts data frames, Arrow tables, or any object that can be converted to an Arrow stream.
 ```{r setup}
-library(deltaR)
+library(deltalakeR)
 ```
 
 ### Creating a New Table
@@ -74,7 +74,7 @@ write_deltalake(sales_data, "path/to/sales_table")
 
 ### Write Modes
 
-deltaR supports four write modes:
+deltalakeR supports four write modes:
 
 ```{r write-modes}
 # error (default): Fail if the table already exists
@@ -158,7 +158,7 @@ get_files(dt)
 
 ### Reading Data
 
-deltaR delegates reading to other libraries like arrow, polars, or duckdb. Use `get_files()` to get the list of Parquet files and pass them to your preferred library:
+deltalakeR delegates reading to other libraries like arrow, polars, or duckdb. Use `get_files()` to get the list of Parquet files and pass them to your preferred library:
 
 ```{r read-data}
 # Get the list of Parquet files in the Delta table
@@ -358,10 +358,10 @@ write_deltalake(
 
 ## Next Steps
 
-- Read the [Cloud Storage Guide](cloud-storage.html) to learn about using deltaR with S3, GCS, and Azure
+- Read the [Cloud Storage Guide](cloud-storage.html) to learn about using deltalakeR with S3, GCS, and Azure
 - Explore the [Function Reference](../reference/index.html) for detailed API documentation
 - Visit the [Delta Lake documentation](https://docs.delta.io/) for more about the Delta Lake format
 
 ## Acknowledgments
 
-deltaR is built on the excellent [delta-rs](https://github.com/delta-io/delta-rs) Rust library. We are grateful to the delta-rs maintainers and the broader Delta Lake community for their work.
+deltalakeR is built on the excellent [delta-rs](https://github.com/delta-io/delta-rs) Rust library. We are grateful to the delta-rs maintainers and the broader Delta Lake community for their work.

@@ -4,10 +4,10 @@
 
 #
 # This file was created with the following call:
-#   .Call("wrap__make_deltaR_wrappers", use_symbols = TRUE, package_name = "deltaR")
+#   .Call("wrap__make_deltalakeR_wrappers", use_symbols = TRUE, package_name = "deltalakeR")
 
 #' @usage NULL
-#' @useDynLib deltaR, .registration = TRUE
+#' @useDynLib deltalakeR, .registration = TRUE
 NULL
 
 #' Register cloud storage handlers (GCS, S3, Azure) for deltalake

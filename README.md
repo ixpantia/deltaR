@@ -1,10 +1,13 @@
-# deltaR <img src="man/figures/logo.png" align="right" height="139" />
+# deltalakeR
+
+> **Notice:** Delta Lake is a trademark of the Linux Foundation and this project is not associated with it.
+
 <!-- badges: start -->
-[![R-CMD-check](https://github.com/ixpantia/deltaR/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/ixpantia/deltaR/actions/workflows/R-CMD-check.yaml)
-[![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
+[![R-CMD-check](https://github.com/ixpantia/deltalakeR/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/ixpantia/deltalakeR/actions/workflows/R-CMD-check.yaml)
+[![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](https://opensource.org/license/apache-2-0)
 <!-- badges: end -->
 
-**deltaR** is an R interface to [Delta Lake](https://delta.io/), providing full support for reading and writing Delta tables with ACID transactions, time travel, and schema evolution. Built on the high-performance [delta-rs](https://github.com/delta-io/delta-rs) Rust library, deltaR brings the power of Delta Lake to R with minimal overhead.
+**deltalakeR** is an R interface to [Delta Lake](https://delta.io/), providing full support for reading and writing Delta tables with ACID transactions, time travel, and schema evolution. Built on the high-performance [delta-rs](https://github.com/delta-io/delta-rs) Rust library, deltalakeR brings the power of Delta Lake to R with minimal overhead.
 
 ## Features
 
@@ -13,15 +16,28 @@
 - 🔀 **MERGE operations** - Upserts, conditional updates, and deletes in a single atomic transaction
 - ⏰ **Time travel** - Access historical versions of your data
 - 🔄 **Schema evolution** - Merge or overwrite schemas as your data evolves
-- ☁️ **Cloud storage** - Native support for S3, Google Cloud Storage, and Azure Blob Storage
+- ☁️ **Cloud storage** - Native support for S3 (Linux/macOS only), Google Cloud Storage, and Azure Blob Storage
 - 🚀 **High performance** - Powered by Rust with memory-efficient streaming writes
 - 📊 **Arrow integration** - Seamless interoperability with the Arrow ecosystem
+
+## Platform Support
+
+deltalakeR supports Windows, macOS, and Linux with the following platform-specific differences:
+
+| Feature | Linux | macOS | Windows |
+|---------|-------|-------|---------|
+| Local Delta tables | ✅ | ✅ | ✅ |
+| Google Cloud Storage (GCS) | ✅ | ✅ | ✅ |
+| Azure Blob Storage | ✅ | ✅ | ✅ |
+| Amazon S3 | ✅ | ✅ | ❌ |
+
+**Note on S3 Support:** Due to compilation issues with the S3 dependencies on Windows, S3 support is currently only available on Linux and macOS. Windows users can still use Google Cloud Storage and Azure Blob Storage for cloud-based Delta tables. This limitation is being tracked and may be resolved in future releases.
 
 ## Installation
 
 ### Prerequisites
 
-deltaR requires the Rust toolchain to compile from source:
+deltalakeR requires the Rust toolchain to compile from source:
 - **Rust** >= 1.88 ([Install Rust](https://rustup.rs/))
 - **Cargo** (included with Rust)
 
@@ -31,8 +47,8 @@ deltaR requires the Rust toolchain to compile from source:
 # Install remotes if needed
 install.packages("remotes")
 
-# Install deltaR
-remotes::install_github("ixpantia/deltaR")
+# Install deltalakeR
+remotes::install_github("ixpantia/deltalakeR")
 ```
 
 ## Quick Start
@@ -40,7 +56,7 @@ remotes::install_github("ixpantia/deltaR")
 ### Writing Data
 
 ```r
-library(deltaR)
+library(deltalakeR)
 
 # Create a data frame
 df <- data.frame(
@@ -68,7 +84,7 @@ write_deltalake(df, "path/to/my_table", mode = "overwrite")
 
 ### Reading Data
 
-deltaR delegates the actual reading of data to other libraries like arrow, polars, or duckdb. Use `get_files()` to get the Parquet file paths from the current table version:
+deltalakeR delegates the actual reading of data to other libraries like arrow, polars, or duckdb. Use `get_files()` to get the Parquet file paths from the current table version:
 
 ```r
 # Open a Delta table
@@ -134,7 +150,7 @@ write_deltalake(
 ### Cloud Storage
 
 ```r
-# Google Cloud Storage
+# Google Cloud Storage (All platforms)
 write_deltalake(
   df,
   "gs://my-bucket/delta_table",
@@ -143,7 +159,7 @@ write_deltalake(
   )
 )
 
-# Amazon S3
+# Amazon S3 (Linux/macOS only)
 write_deltalake(
   df,
   "s3://my-bucket/delta_table",
@@ -154,7 +170,7 @@ write_deltalake(
   )
 )
 
-# Azure Blob Storage
+# Azure Blob Storage (All platforms)
 write_deltalake(
   df,
   "az://my-container/delta_table",
@@ -165,9 +181,11 @@ write_deltalake(
 )
 ```
 
+**Platform Note:** S3 support is only available on Linux and macOS due to compilation issues on Windows. Windows users should use Google Cloud Storage or Azure Blob Storage for cloud-based Delta tables.
+
 ## MERGE Operations
 
-deltaR supports Delta Lake's MERGE operation for sophisticated upserts:
+deltalakeR supports Delta Lake's MERGE operation for sophisticated upserts:
 
 ```r
 # Create target table
@@ -212,7 +230,7 @@ See `vignette("merge-operations")` for more examples.
 
 ## Schema Evolution
 
-deltaR supports schema evolution when appending data:
+deltalakeR supports schema evolution when appending data:
 
 ```r
 # Original table
@@ -226,7 +244,7 @@ write_deltalake(df2, "path/to/table", mode = "append", schema_mode = "merge")
 
 ## Supported Data Types
 
-deltaR supports all Delta Lake compatible Arrow types:
+deltalakeR supports all Delta Lake compatible Arrow types:
 
 | R Type | Arrow Type | Delta Lake Type |
 |--------|------------|-----------------|
@@ -282,12 +300,12 @@ write_deltalake(
 
 ## Acknowledgments
 
-deltaR is built on the shoulders of giants:
+deltalakeR is built on the shoulders of giants:
 
 - **[delta-rs](https://github.com/delta-io/delta-rs)**
 - **[Delta Lake](https://delta.io/)**
 - **[Apache Arrow](https://arrow.apache.org/)**
-- **[extendr](https://extendr.github.io/)** - Thanks to CGMossa and the extendr contributors for making Rust + R a reality
+- **[extendr](https://extendr.rs/)** - Thanks to CGMossa and the extendr contributors for making Rust + R a reality
 - **[arrow-extendr](https://github.com/extendr/arrow-extendr)** - Thanks to @JosiahParry for the Arrow bindings that make this all work together
 
 ## Contributing
@@ -298,12 +316,14 @@ Contributions are welcome! Please feel free to submit a Pull Request. For major 
 
 This project is licensed under the Apache License 2.0 - see the [LICENSE](LICENSE) file for details.
 
+Delta Lake is a trademark of the Linux Foundation and this project is not associated with it.
+
 ## Related Projects
 
 - [arrow](https://arrow.apache.org/docs/r/) - R package for Apache Arrow
 - [polars](https://pola-rs.github.io/r-polars/) - R interface for Polars (can read Delta tables)
 - [duckdb](https://duckdb.org/docs/api/r) - DuckDB R API (can read Delta tables)
-- [sparklyr](https://spark.rstudio.com/) - R interface for Apache Spark (supports Delta Lake)
+- [sparklyr](https://spark.posit.co/) - R interface for Apache Spark (supports Delta Lake)
 
 ---
 

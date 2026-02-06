@@ -143,7 +143,7 @@ test_that("delta_table constructor handles invalid path", {
   # If it didn't error, it should at least not be NULL
 
   if (!identical(result, "error")) {
-    expect_true(inherits(result, "deltaR::DeltaTable") || is.null(result))
+    expect_true(inherits(result, "deltalakeR::DeltaTable") || is.null(result))
   } else {
     expect_true(TRUE) # Error was thrown, which is expected
   }
@@ -250,7 +250,7 @@ test_that("delta_table can open existing table", {
   test_table <- skip_if_no_test_table()
 
   dt <- delta_table(test_table)
-  expect_s3_class(dt, "deltaR::DeltaTable")
+  expect_s3_class(dt, "deltalakeR::DeltaTable")
 })
 
 test_that("version returns non-negative integer", {

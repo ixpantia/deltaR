@@ -14,13 +14,17 @@ use std::collections::HashMap;
 use std::sync::Arc;
 use tokio::runtime::Runtime;
 
-/// Register cloud storage handlers (GCS, S3, Azure) for deltalake
+/// Register cloud storage handlers (GCS, Azure, and S3 on Unix) for deltalake
 /// Called from R's .onLoad to enable cloud storage support
+///
+/// Note: S3 support is only available on Unix platforms (Linux/macOS) due to
+/// compilation issues on Windows. Windows builds support GCS and Azure only.
 #[extendr]
 fn register_cloud_handlers() {
     // Register GCS handler
     deltalake::gcp::register_handlers(None);
-    // Register S3 handler
+    // Register S3 handler (Unix only - compilation issues on Windows)
+    #[cfg(unix)]
     deltalake::aws::register_handlers(None);
     // Register Azure handler
     deltalake::azure::register_handlers(None);
@@ -478,7 +482,7 @@ fn is_delta_table(path: &str, storage_options: Nullable<List>) -> bool {
 // Macro to generate exports.
 // This ensures exported functions are registered with R.
 extendr_module! {
-    mod deltaR;
+    mod deltalakeR;
     use merge;
     use write;
     impl DeltaTableInternal;

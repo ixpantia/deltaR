@@ -4,48 +4,6 @@
 # check the packages MSRV first
 source("tools/msrv.R")
 
-# check if we are on Windows
-is_windows <- .Platform[["OS.type"]] == "windows"
-
-# Generate a short target directory for Windows to avoid MAX_PATH issues
-# aws-lc-sys builds fail when paths exceed ~250 characters
-# IMPORTANT: Both CARGO_HOME and TARGET_DIR must be in the same short path
-# so that relative paths in aws-lc-sys CMake builds resolve correctly
-if (is_windows) {
-  # For CI builds (NOT_CRAN set), we can use a fixed short path
-
-  # For CRAN builds, we use tempdir but write the path to a file so that
-
-  # subsequent R sessions (configure vs build) use the same directory
-
-  env_not_cran_check <- Sys.getenv("NOT_CRAN")
-
-  if (env_not_cran_check != "") {
-    # CI build - use fixed short path (no CRAN policy concerns)
-    short_base <- "C:/tmp/dR"
-  } else {
-    # CRAN build - use tempdir but persist the path choice
-    # Create a marker file in the source directory to ensure consistency
-    marker_file <- "src/.short_build_path"
-    if (file.exists(marker_file)) {
-      short_base <- readLines(marker_file, n = 1)
-    } else {
-      short_base <- gsub("\\\\", "/", file.path(tempdir(), "dR"))
-      writeLines(short_base, marker_file)
-    }
-  }
-
-  # Normalize to forward slashes for Make compatibility
-  .short_base <- short_base
-  .target_dir <- paste0(short_base, "/target")
-  .cargo_home <- paste0(short_base, "/.cargo")
-  message("Using short build path: ", short_base)
-} else {
-  .short_base <- "$(CURDIR)"
-  .target_dir <- "./rust/target"
-  .cargo_home <- "$(CURDIR)/.cargo"
-}
-
 # check DEBUG and NOT_CRAN environment variables
 env_debug <- Sys.getenv("DEBUG")
 env_not_cran <- Sys.getenv("NOT_CRAN")
@@ -113,6 +71,7 @@ cfg <- if (is_debug) "debug" else "release"
 )
 
 # read in the Makevars.in file checking
+is_windows <- .Platform[["OS.type"]] == "windows"
 
 # if windows we replace in the Makevars.win.in
 mv_fp <- ifelse(
@@ -143,10 +102,7 @@ new_txt <- gsub("@CRAN_FLAGS@", .cran_flags, mv_txt) |>
   gsub("@CLEAN_TARGET@", .clean_targets, x = _) |>
   gsub("@LIBDIR@", .libdir, x = _) |>
   gsub("@TARGET@", .target, x = _) |>
-  gsub("@PANIC_EXPORTS@", .panic_exports, x = _) |>
-  gsub("@TARGET_DIR@", .target_dir, x = _) |>
-  gsub("@CARGO_HOME@", .cargo_home, x = _) |>
-  gsub("@SHORT_BASE@", .short_base, x = _)
+  gsub("@PANIC_EXPORTS@", .panic_exports, x = _)
 
 message("Writing `", mv_ofp, "`.")
 con <- file(mv_ofp, open = "wb")
