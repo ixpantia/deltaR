@@ -1,0 +1,54 @@
+# Workflow optimized for Windows I/O performance
+# Using the D: drive (Temp Storage) for library and temp files, which is faster than the C: drive on GitHub-hosted runners
+# Insights from: https://chadgolden.com/blog/github-actions-hosted-windows-runners-slower-than-expected-ci-and-you
+on:
+  push:
+    branches: [main, master, dev]
+  pull_request:
+
+name: R-CMD-check (Windows)
+
+permissions: read-all
+
+jobs:
+  R-CMD-check:
+    runs-on: windows-latest
+
+    name: windows-latest (release)
+
+    env:
+      GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
+      R_KEEP_PKG_SOURCE: yes
+      # Move R library and temp files to the faster D: drive to speed up I/O
+      R_LIBS_USER: D:\R\library
+      TMP: D:\temp
+      TEMP: D:\temp
+      TMPDIR: D:\temp
+
+    steps:
+      - name: "Create directories on D: drive"
+        run: |
+          mkdir D:\R\library -Force
+          mkdir D:\temp -Force
+        shell: pwsh
+
+      # Using default checkout location to avoid pathing issues with GitHub Actions
+      - uses: actions/checkout@v4
+
+      - uses: r-lib/actions/setup-pandoc@v2
+
+      - uses: r-lib/actions/setup-r@v2
+        with:
+          r-version: "release"
+          use-public-rspm: true
+
+      - uses: r-lib/actions/setup-r-dependencies@v2
+        with:
+          extra-packages: any::rcmdcheck
+          needs: check
+
+      - name: Run R CMD check
+        uses: r-lib/actions/check-r-package@v2
+        with:
+          upload-snapshots: true
+          build_args: 'c("--no-manual","--compact-vignettes=gs+qpdf")'
