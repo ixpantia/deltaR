@@ -1,16 +1,6 @@
 #' @importFrom rlang abort
 NULL
 
-#' Check if a path is a local filesystem path (not a cloud URI)
-#'
-#' @param path Character. Path to check.
-#' @return Logical. TRUE if the path is a local filesystem path.
-#' @noRd
-is_local_path <- function(path) {
-  # Cloud storage URIs typically start with a scheme like s3://, gs://, az://, abfs://, etc.
-
-  !grepl("^[a-zA-Z][a-zA-Z0-9+.-]*://", path)
-}
 
 #' Ensure directory exists for local paths
 #'
@@ -120,6 +110,15 @@ write_deltalake <- function(
     stop("'table_or_uri' must be a single character string")
   }
 
+  # Normalize path if it's a local path to avoid mixed slashes on Windows
+  if (is_local_path(table_or_uri)) {
+    table_or_uri <- normalizePath(
+      table_or_uri,
+      mustWork = FALSE,
+      winslash = "/"
+    )
+  }
+
   # Create directory if it's a local path and doesn't exist
   ensure_directory_exists(table_or_uri)
 
@@ -225,6 +224,11 @@ create_deltalake <- function(
   # Validate table_uri
   if (!is.character(table_uri) || length(table_uri) != 1) {
     stop("'table_uri' must be a single character string")
+  }
+
+  # Normalize path if it's a local path to avoid mixed slashes on Windows
+  if (is_local_path(table_uri)) {
+    table_uri <- normalizePath(table_uri, mustWork = FALSE, winslash = "/")
   }
 
   # Create directory if it's a local path and doesn't exist

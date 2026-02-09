@@ -158,6 +158,11 @@ delta_merge <- function(
     stop("'table' must be a DeltaTable object or a single character path")
   }
 
+  # Normalize path if it's a local path to avoid mixed slashes on Windows
+  if (is_local_path(table_path)) {
+    table_path <- normalizePath(table_path, mustWork = FALSE, winslash = "/")
+  }
+
   DeltaMergeBuilder(
     table_path = table_path,
     storage_options = storage_options,

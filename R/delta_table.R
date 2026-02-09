@@ -62,6 +62,11 @@ delta_table <- function(
     stop("'path' must be a single character string")
   }
 
+  # Normalize path if it's a local path to avoid mixed slashes on Windows
+  if (is_local_path(path)) {
+    path <- normalizePath(path, mustWork = FALSE, winslash = "/")
+  }
+
   if (!is.null(version) && !is.null(datetime)) {
     stop("Cannot specify both 'version' and 'datetime'")
   }
@@ -359,6 +364,11 @@ method(load_datetime, DeltaTable) <- function(table, ..., datetime) {
 #'
 #' @export
 is_delta_table_path <- function(path, storage_options = NULL) {
+  # Normalize path if it's a local path to avoid mixed slashes on Windows
+  if (is.character(path) && length(path) == 1 && is_local_path(path)) {
+    path <- normalizePath(path, mustWork = FALSE, winslash = "/")
+  }
+
   result <- is_delta_table(path, storage_options)
   if (methods::is(result, "error")) {
     rlang::abort(result$value)

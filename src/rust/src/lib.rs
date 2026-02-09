@@ -127,18 +127,31 @@ pub(crate) fn parse_storage_options(opts: &List) -> HashMap<String, String> {
 
 /// Helper to convert a path string to URL
 pub(crate) fn path_to_url(path: &str) -> std::result::Result<url::Url, String> {
-    // Try parsing as URL first
-    if let Ok(url) = url::Url::parse(path) {
-        return Ok(url);
+    // Try parsing as URL first. On Windows, a path like "C:\..." might be
+    // parsed as a URL with scheme "C", so we only accept it as a URL if it
+    // contains "://" and the scheme is longer than 1 character (to avoid drive letters).
+    if path.contains("://") {
+        if let Ok(url) = url::Url::parse(path) {
+            if url.scheme().len() > 1 {
+                return Ok(url);
+            }
+        }
     }
 
     // Treat as local path
     let path_buf = std::path::Path::new(path);
-    let canonical = path_buf
-        .canonicalize()
-        .unwrap_or_else(|_| path_buf.to_path_buf());
 
-    url::Url::from_file_path(&canonical)
+    // Get absolute path. We avoid canonicalize() on Windows because it adds
+    // the \\?\ prefix which some object store implementations don't handle well.
+    let abs_path = if path_buf.is_absolute() {
+        path_buf.to_path_buf()
+    } else {
+        std::env::current_dir()
+            .map(|curr| curr.join(path_buf))
+            .unwrap_or_else(|_| path_buf.to_path_buf())
+    };
+
+    url::Url::from_file_path(&abs_path)
         .map_err(|_| format!("Failed to create URL from path: {}", path))
 }
 

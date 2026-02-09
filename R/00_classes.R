@@ -1,6 +1,17 @@
 #' @import S7
 NULL
 
+#' Check if a path is a local filesystem path (not a cloud URI)
+#'
+#' @param path Character. Path to check.
+#' @return Logical. TRUE if the path is a local filesystem path.
+#' @noRd
+is_local_path <- function(path) {
+  # Cloud storage URIs typically start with a scheme like s3://, gs://, az://, abfs://, etc.
+
+  !grepl("^[a-zA-Z][a-zA-Z0-9+.-]*://", path)
+}
+
 .onLoad <- function(...) {
   # Register cloud storage handlers (GCS, S3, Azure) for Delta Lake
 
